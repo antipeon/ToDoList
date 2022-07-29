@@ -34,11 +34,11 @@ struct FileCache {
     /// Saves collection to file
     /// - Parameter fileName: name of file to save to
     func save(to fileName: String) throws {
-        let toDoItemsDictionaries = NSArray(array: toDoItems.map {
-            $0.json as! NSDictionary
-        })
+        let toDoItemsJsons = toDoItems.map {
+            $0.json
+        }
         
-        guard JSONSerialization.isValidJSONObject(toDoItemsDictionaries), let jsonData = try? JSONSerialization.data(withJSONObject: toDoItemsDictionaries, options: .prettyPrinted) else {
+        guard JSONSerialization.isValidJSONObject(toDoItemsJsons), let jsonData = try? JSONSerialization.data(withJSONObject: toDoItemsJsons, options: .prettyPrinted) else {
             throw FileCacheError.jsonConversion
         }
         
@@ -55,7 +55,7 @@ struct FileCache {
 
         let decodedObject = try JSONSerialization.jsonObject(with: jsonData)
         
-        guard let dictionaries = decodedObject as? NSArray else {
+        guard let dictionaries = decodedObject as? [Any] else {
             throw FileCacheError.jsonDecode
         }
         

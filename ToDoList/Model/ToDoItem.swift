@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ToDoItem: Identifiable {
+struct ToDoItem: Identifiable, Equatable {
     let id: String
     let text: String
     let priority: Priority
@@ -21,10 +21,18 @@ struct ToDoItem: Identifiable {
         self.id = id
         self.text = text
         self.priority = priority
-        self.deadline = deadline
+        if let deadline = deadline {
+            self.deadline = Date.makeDateWithRoundedTimeIntervalSince1970(from: deadline)
+        } else {
+            self.deadline = nil
+        }
         self.done = done
-        self.createdAt = createdAt
-        self.modifiedAt = modifiedAt
+        self.createdAt = Date.makeDateWithRoundedTimeIntervalSince1970(from: createdAt)
+        if let modifiedAt = modifiedAt {
+            self.modifiedAt = Date.makeDateWithRoundedTimeIntervalSince1970(from: modifiedAt)
+        } else {
+            self.modifiedAt = nil
+        }
     }
     
     enum Priority: String {
@@ -34,45 +42,28 @@ struct ToDoItem: Identifiable {
     }
 }
 
-extension ToDoItem: Equatable {
-    static func == (lhs: ToDoItem, rhs: ToDoItem) -> Bool {
-        if lhs.id == rhs.id, lhs.text == rhs.text, lhs.priority == rhs.priority,
-           Date.dateEqual(lhs.deadline, rhs.deadline), lhs.done == rhs.done,
-           Date.dateEqual(lhs.createdAt, rhs.createdAt), Date.dateEqual(lhs.modifiedAt, rhs.modifiedAt) {
-            return true
-        }
-        return false
-    }
-}
-
 extension ToDoItem {
-    init?(from dictionary: NSDictionary) {
+    init?(from dictionary: [String: Any]) {
         // check if only allowed keys
         let allowedKeys = ["id", "text", "done", "createdAt", "priority", "deadline", "modifiedAt"]
-        let notAllowedKeys = dictionary.allKeys
-            .map {
-                $0 as? String
-            }
-            .compactMap { $0 }
+        let notAllowedKeys = dictionary.keys
             .filter {
                 !allowedKeys.contains($0)
             }
         guard notAllowedKeys.isEmpty else {
             return nil
         }
-        
         // these keys have to be there
-        guard let id = dictionary.value(forKey: "id") as? String,
-              let text = dictionary.value(forKey: "text") as? String,
-              let doneStr = dictionary.value(forKey: "done") as? String,
-              let done = Bool(doneStr),
-              let createdAt = (dictionary.value(forKey: "createdAt") as? String)?.date else {
+        guard let id = dictionary["id"] as? String,
+              let text = dictionary["text"] as? String,
+              let done = dictionary["done"] as? Bool,
+              let createdAt = (dictionary["createdAt"] as? Int)?.date else {
             return nil
         }
         
         // set priority
         var priority = Priority.normal
-        if let priorityInDictionaryStr = dictionary.value(forKey: "priority") as? String {
+        if let priorityInDictionaryStr = dictionary["priority"] as? String {
             guard let priorityInDictionary = Priority(rawValue: priorityInDictionaryStr) else {
                 return nil
             }
@@ -83,18 +74,18 @@ extension ToDoItem {
         }
         
         // set optional properties
-        let deadline = (dictionary.value(forKey: "deadline") as? String)?.date
-        let modifiedAt = (dictionary.value(forKey: "modifiedAt") as? String)?.date
+        let deadline = (dictionary["deadline"] as? Int)?.date
+        let modifiedAt = (dictionary["modifiedAt"] as? Int)?.date
         
         self.init(id: id, text: text, priority: priority, createdAt: createdAt, deadline: deadline, done: done, modifiedAt: modifiedAt)
     }
     
     /// Parses json to toDoItem
-    /// - Parameter json: NSDictionary [String: Any]
+    /// - Parameter json: [String: Any]
     /// - Returns: ToDoItem if can convert
     static func parse(json: Any) -> ToDoItem? {
 
-        guard let dictionary = json as? NSDictionary else {
+        guard let dictionary = json as? [String: Any] else {
             return nil
         }
         
@@ -102,12 +93,12 @@ extension ToDoItem {
     }
     
     /// Produces json from self
-    /// - Returns: json as NSDictionary [String: Any]
+    /// - Returns: json as [String: Any]
     var json: Any {
-        var dictionary = [
+        var dictionary: [String: Any] = [
             "id" : id,
             "text" : text,
-            "done" : done.description,
+            "done" : done,
             "createdAt" : createdAt.timeStamp,
         ]
         
@@ -125,37 +116,26 @@ extension ToDoItem {
         if let modifiedAt = modifiedAt {
             dictionary["modifiedAt"] = modifiedAt.timeStamp
         }
-        
-        let nsDictionary = NSDictionary(dictionary: dictionary)
-        return nsDictionary
+        return dictionary
     }
 }
 
 extension Date {
-    var timeStamp: String {
-        (round(self.timeIntervalSince1970 * 10) / 10.0).description
+    var timeStamp: Int {
+        Int(self.timeIntervalSince1970)
     }
     
-    // implement equal with precision: https://developer.apple.com/documentation/foundation/timeinterval
-    static func dateEqual(_ lhs: Date?, _ rhs: Date?) -> Bool {
-        if lhs == nil && rhs == nil {
-            return true
-        }
-        if lhs == nil && rhs != nil {
-            return false
-        }
-        if lhs != nil && rhs == nil {
-            return false
-        }
-        return lhs?.timeStamp == rhs?.timeStamp
+    init(roundedTimeIntervalSince1970: Int) {
+        self.init(timeIntervalSince1970: Double(roundedTimeIntervalSince1970))
+    }
+    
+    static func makeDateWithRoundedTimeIntervalSince1970(from date: Date) -> Date {
+        return Date(roundedTimeIntervalSince1970: Int(date.timeIntervalSince1970))
     }
 }
 
-extension String {
+extension Int {
     var date: Date? {
-        guard let interval = Double(self) else {
-            return nil
-        }
-        return Date(timeIntervalSince1970: interval)
+        return Date(timeIntervalSince1970: Double(self))
     }
 }
