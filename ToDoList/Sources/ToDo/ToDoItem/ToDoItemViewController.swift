@@ -53,6 +53,23 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
         self.setUpToHideKeyboardOnTapView()
     }
     
+    // MARK: - Portrait Mode
+    override func viewWillAppear(_ animated: Bool) {
+       super.viewWillAppear(animated)
+       
+       AppUtility.lockOrientation(.portrait)
+       // Or to rotate and lock
+       // AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
+       
+   }
+
+   override func viewWillDisappear(_ animated: Bool) {
+       super.viewWillDisappear(animated)
+       
+       // Don't forget to reset when view is being removed
+       AppUtility.lockOrientation(.all)
+   }
+    
     // MARK: - ToDoItemModule
     func addItem(_ item: ToDoItem?) {
         guard let item = item else {

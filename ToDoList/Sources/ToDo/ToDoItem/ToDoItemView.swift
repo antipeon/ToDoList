@@ -362,7 +362,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         calendarSwitch.isOn
     }
     
-    // MARK: -Actions
+    // MARK: - Actions
     @objc func dismiss() {
         module?.dismiss()
     }
@@ -401,7 +401,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         setNeedsDisplay()
     }
     
-    // MARK: -TextViewDelegate
+    // MARK: - TextViewDelegate
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == Constants.Colors.labelTertiary {
             textView.text = nil
@@ -449,7 +449,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         item = ToDoItem(text: toDoText.text, priority: priority, createdAt: now, deadline: deadline, modifiedAt: now)
     }
     
-    // MARK: -Constants
+    // MARK: - Constants
     private struct Constants {
         struct Colors {
             static let secondary = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
