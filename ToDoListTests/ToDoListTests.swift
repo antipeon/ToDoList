@@ -35,33 +35,37 @@ class ToDoListTests: XCTestCase {
     func testParseToJsonThenInitFromJson_ObjectsAreEqual1() {
         let jsonForItem = firstItem.json
         let item = ToDoItem.parse(json: jsonForItem)
-        XCTAssertEqual(firstItem, item)
+        XCTAssertTrue(ToDoItem.haveSameProperties(firstItem, item))
     }
     
     func testParseToJsonThenInitFromJson_ObjectsAreEqual2() {
         let jsonForItem = secondItem.json
         let item = ToDoItem.parse(json: jsonForItem)
-        XCTAssertEqual(secondItem, item)
+        XCTAssertTrue(ToDoItem.haveSameProperties(secondItem, item))
     }
     
     // MARK: - FileCache tests
     func testAddItem() {
-        var fileCache = FileCache()
+        let fileCache = FileCache()
         XCTAssertTrue(fileCache.add(firstItem))
         XCTAssertFalse(fileCache.add(firstItem))
-        XCTAssertEqual(fileCache.toDoItems.first!, firstItem)
+        guard let toDoItemsFirst = fileCache.toDoItems.first else {
+            XCTFail()
+            return
+        }
+        XCTAssertTrue(ToDoItem.haveSameProperties(toDoItemsFirst, firstItem))
     }
     
     func testRemoveItem() {
-        var fileCache = FileCache()
+        let fileCache = FileCache()
         XCTAssertNil(fileCache.remove(firstItem))
         fileCache.add(firstItem)
         XCTAssertNil(fileCache.remove(secondItem))
-        XCTAssertEqual(fileCache.remove(firstItem), firstItem)
+        XCTAssertTrue(ToDoItem.haveSameProperties(fileCache.remove(firstItem), firstItem))
     }
     
     func testSaveToFileThenLoadFromFile_ObjectsAreEqual() throws {
-        var fileCache = FileCache()
+        let fileCache = FileCache()
         fileCache.add(firstItem)
         fileCache.add(secondItem)
         
@@ -70,10 +74,10 @@ class ToDoListTests: XCTestCase {
         
         XCTAssertEqual(fileCache.toDoItems.count, 2)
         
-        var fileCache1 = FileCache()
+        let fileCache1 = FileCache()
         try fileCache1.load(from: fileName)
         
-        XCTAssertEqual(fileCache, fileCache1)
+        XCTAssertTrue(FileCache.haveItemsWithSameProperties(fileCache, fileCache1))
     }
 
     func testPerformanceExample() throws {
@@ -88,5 +92,40 @@ class ToDoListTests: XCTestCase {
 extension Date {
     func incrementedBy(days: Int) -> Date {
         return Calendar.current.date(byAdding: DateComponents(day: days), to: .now)!
+    }
+}
+
+extension ToDoItem {
+    static func haveSameProperties(_ lhs: ToDoItem?, _ rhs: ToDoItem?) -> Bool {
+        guard let lhs = lhs, let rhs = rhs else {
+            if lhs == nil && rhs == nil {
+                return true
+            }
+            if lhs == nil && rhs != nil {
+                return false
+            }
+            if lhs != nil && rhs == nil {
+                return false
+            }
+            fatalError("can't reach here")
+        }
+        
+        return lhs.id == rhs.id && lhs.text == rhs.text &&
+        lhs.priority == rhs.priority && lhs.createdAt == rhs.createdAt &&
+        lhs.deadline == rhs.deadline && lhs.done == rhs.done && lhs.modifiedAt == rhs.modifiedAt
+    }
+}
+
+extension FileCache {
+    static func haveItemsWithSameProperties(_ lhs: FileCache, _ rhs: FileCache) -> Bool {
+        guard lhs.toDoItems.count == rhs.toDoItems.count else {
+            return false
+        }
+        for i in 0..<lhs.toDoItems.count {
+            if !ToDoItem.haveSameProperties(lhs.toDoItems[i], rhs.toDoItems[i]) {
+                return false
+            }
+        }
+        return true
     }
 }

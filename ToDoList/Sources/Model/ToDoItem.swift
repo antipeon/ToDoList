@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ToDoItem: Identifiable, Equatable {
+struct ToDoItem: Identifiable {
     let id: String
     let text: String
     let priority: Priority
@@ -39,6 +39,12 @@ struct ToDoItem: Identifiable, Equatable {
         case high
         case normal
         case low
+    }
+}
+
+extension ToDoItem: Equatable {
+    static func == (lhs: ToDoItem, rhs: ToDoItem) -> Bool {
+        return lhs.id == rhs.id
     }
 }
 
