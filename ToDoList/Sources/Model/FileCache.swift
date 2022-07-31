@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct FileCache {
+class FileCache {
     private(set) var toDoItems = [ToDoItem]()
     
     /// Adds item to collection if not present
     /// - Parameter item: Item to add
     /// - Returns: true if successfully added; false otherwise
-    @discardableResult mutating func add(_ item: ToDoItem) -> Bool {
+    @discardableResult func add(_ item: ToDoItem) -> Bool {
         if toDoItems.index(matching: item) != nil {
             return false
         }
@@ -24,7 +24,7 @@ struct FileCache {
     /// Removes item from collection if present
     /// - Parameter item: Item to remove
     /// - Returns: Removed item; nil otherwise
-    @discardableResult mutating func remove(_ item: ToDoItem) -> ToDoItem? {
+    @discardableResult func remove(_ item: ToDoItem) -> ToDoItem? {
         guard let index = toDoItems.index(matching: item) else {
             return nil
         }
@@ -48,7 +48,7 @@ struct FileCache {
     
     /// Loads collection from file
     /// - Parameter fileName: name of file to load from
-    mutating func load(from fileName: String) throws {
+    func load(from fileName: String) throws {
         let fileUrl = fileInDocumentDir(with: fileName)
         
         let jsonData = try Data(contentsOf: fileUrl)
@@ -87,7 +87,11 @@ struct FileCache {
     }
 }
 
-extension FileCache: Equatable { }
+extension FileCache: Equatable {
+    static func == (lhs: FileCache, rhs: FileCache) -> Bool {
+        lhs.toDoItems == rhs.toDoItems
+    }
+}
 
 extension FileCache.FileCacheError {
     public var description: String {
@@ -97,13 +101,5 @@ extension FileCache.FileCacheError {
         case .jsonDecode:
             return "can't decode json"
         }
-    }
-}
-
-extension Collection where Element: Identifiable {
-    func index(matching element: Element) -> Index? {
-        firstIndex(where: {
-            $0.id == element.id
-        })
     }
 }
