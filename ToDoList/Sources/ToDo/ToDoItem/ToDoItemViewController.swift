@@ -48,6 +48,11 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
         view = toDoItemView
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.setUpToHideKeyboardOnTapView()
+    }
+    
     // MARK: - ToDoItemModule
     func addItem(_ item: ToDoItem?) {
         guard let item = item else {
@@ -67,4 +72,17 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     }
     
     private let filename = "toDoItems"
+}
+
+extension UIViewController {
+    func setUpToHideKeyboardOnTapView() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
 }

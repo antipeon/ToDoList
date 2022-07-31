@@ -26,12 +26,11 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         view.layer.cornerRadius = Constants.cornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
         view.textContainerInset = defaultLayoutMargins
-        view.text = Constants.mockText1
-        view.font = Constants.Fonts.body
         view.backgroundColor = Constants.Colors.secondary
+        view.font = Constants.Fonts.body
+        view.autocorrectionType = .no
         
         view.delegate = self
-        setUpTextViewPlaceholder(view)
         
         return view
     }()
@@ -60,15 +59,18 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         datePicker.layer.cornerRadius = Constants.cornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.translatesAutoresizingMaskIntoConstraints = false
-        datePicker.setDate(date, animated: true)
-        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+        datePicker.setDate(deadline, animated: true)
+        datePicker.addTarget(self, action: #selector(datePickerDateChanged), for: .valueChanged)
+        
+        datePicker.isHidden = true
         
         return datePicker
     }()
     
     private lazy var calendarSwitch: UISwitch = {
         let switchButton = UISwitch()
-        switchButton.addTarget(self, action: #selector(switchCalendarState), for: .touchUpInside)
+        switchButton.isOn = (item?.deadline == nil ? false : true)
+        switchButton.addTarget(self, action: #selector(toggleCalendarState), for: .touchUpInside)
         switchButton.translatesAutoresizingMaskIntoConstraints = false
         return switchButton
         
@@ -116,7 +118,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         return view
     }()
     
-    private lazy var importanceLabel: UILabel = {
+    private lazy var priorityLabel: UILabel = {
         let label = UILabel()
         label.text = "Важность"
         label.font = Constants.Fonts.body
@@ -125,7 +127,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         return label
     }()
     
-    private lazy var importanceSwitch: UISegmentedControl = {
+    private lazy var prioritySwitch: UISegmentedControl = {
         let view = UISegmentedControl()
         view.insertSegment(with: UIImage(systemName: "arrow.down"), at: 0, animated: false)
         view.insertSegment(withTitle: "нет", at: 1, animated: false)
@@ -137,7 +139,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         return view
     }()
     
-    private lazy var importanceSwitchAndLabel: UIStackView = {
+    private lazy var prioritySwitchAndLabel: UIStackView = {
         let view = UIStackView()
         view.axis = .horizontal
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -149,6 +151,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         view.axis = .horizontal
         view.layer.cornerRadius = Constants.cornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.alignment = .center
         return view
     }()
     
@@ -209,6 +212,8 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         backgroundColor = Constants.Colors.backPrimary
         addViews()
         setUpConstraints()
+        loadModel()
+        updateViewsDisplay()
     }
     
     private func addViews() {
@@ -217,10 +222,10 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         
         calendarButtonAndSwitch.addArrangedSubviews(doBeforeLabelAndCalendarButton, calendarSwitch)
         
-        importanceSwitchAndLabel.addArrangedSubviews(importanceLabel, importanceSwitch)
+        prioritySwitchAndLabel.addArrangedSubviews(priorityLabel, prioritySwitch)
 
         lowerSectionVstackView.addArrangedSubviews(
-            importanceSwitchAndLabel,
+            prioritySwitchAndLabel,
             dividerView1,
             calendarButtonAndSwitch,
             dividerView2,
@@ -232,8 +237,8 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             lowerSectionVstackView,
             deleteButton
         )
-        addSubview(navigationBar)
-        addSubview(vStackView)
+        
+        addSubviews(navigationBar, vStackView)
     }
     
     private func setUpConstraints() {
@@ -248,11 +253,35 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
 
             dividerView1.heightAnchor.constraint(equalToConstant: 1),
-            dividerView2.heightAnchor.constraint(equalToConstant: 1),
-
-//            calendarSwitch.centerYAnchor.constraint(equalTo: doBeforeLabelAndCalendarButton.centerYAnchor),
-            
+            dividerView2.heightAnchor.constraint(equalToConstant: 1)
         ])
+    }
+    
+    private func loadModel() {
+        setUpToDoText()
+        setUpPriority()
+    }
+    
+    private func setUpToDoText() {
+        if let item = item {
+            toDoText.text = item.text
+            toDoText.textColor = Constants.Colors.labelPrimary
+            return
+        }
+        setUpTextViewPlaceholder(toDoText)
+    }
+    
+    private func setUpPriority() {
+        if let item = item {
+            switch item.priority {
+            case .high:
+                prioritySwitch.selectedSegmentIndex = 2
+            case .normal:
+                prioritySwitch.selectedSegmentIndex = 1
+            case .low:
+                prioritySwitch.selectedSegmentIndex = 0
+            }
+        }
     }
     
     private func toggleCalendar() {
@@ -271,7 +300,8 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }
     
     private var enoughInfoFilled: Bool {
-        textLabelNotEmpty && calendarSwitch.isOn
+//        textLabelNotEmpty && calendarSwitch.isOn
+        textLabelNotEmpty
     }
     
     private var textLabelNotEmpty: Bool {
@@ -300,11 +330,20 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     private var dateStr: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd MMMM YYYY"
-        return dateFormatter.string(from: date)
+        return dateFormatter.string(from: deadline)
         
     }
     
-    private lazy var date: Date = {
+    private func updateSelectedDate() {
+        calendar.date = deadline
+        calendarButton.setTitle(dateStr, for: .normal)
+    }
+    
+    private lazy var initialDeadline: Date = {
+        if let deadline = item?.deadline {
+            return deadline
+        }
+        
         var dayComponent = DateComponents()
         dayComponent.day = 1
         let date: Date? = Calendar.current.date(byAdding: dayComponent, to: .now)
@@ -313,6 +352,10 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             fatalError("can't convert date")
         }
         return date
+    }()
+    
+    private lazy var deadline: Date = {
+        initialDeadline
     }()
     
     private var dateSelected: Bool {
@@ -325,23 +368,36 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }
     
     @objc func save() {
+        updateModel()
         module?.addItem(item)
+        module?.dismiss()
     }
     
     @objc func deleteItem() {
+        updateModel()
         module?.deleteItem(item)
         module?.dismiss()
     }
     
-    @objc func dateChanged() {
-        date = calendar.date
+    @objc func datePickerDateChanged() {
+        deadline = calendar.date
         calendarButton.setTitle(dateStr, for: .normal)
         hideCalendar()
+        updateViewsDisplay()
         setNeedsDisplay()
     }
     
     @objc func switchCalendarState() {
         toggleCalendar()
+        updateViewsDisplay()
+        setNeedsDisplay()
+    }
+    
+    @objc func toggleCalendarState() {
+        toggleCalendar()
+        deadline = initialDeadline
+        updateSelectedDate()
+        updateViewsDisplay()
         setNeedsDisplay()
     }
     
@@ -349,7 +405,10 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == Constants.Colors.labelTertiary {
             textView.text = nil
-            textView.textColor = UIColor.black
+            textView.textColor = Constants.Colors.labelPrimary
+        } else {
+            // idk why this === deselection
+            textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument)
         }
     }
     
@@ -359,15 +418,35 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         }
     }
     
-    // MARK: -UIView
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    func textViewDidChange(_ textView: UITextView) {
+        updateViewsDisplay()
+        setNeedsDisplay(navigationBar.frame)
+    }
+    
+    private func updateViewsDisplay() {
         deleteButton.isEnabled = enoughInfoFilled
         navigationBar.items?.first?.rightBarButtonItem?.isEnabled = enoughInfoFilled
         calendarButton.isHidden = !dateSelected
         if !dateSelected {
             calendar.isHidden = true
         }
+    }
+    
+    private func updateModel() {
+        guard let priority = ToDoItem.Priority.makePriorityFromSelectedSegmentIndex(prioritySwitch.selectedSegmentIndex) else {
+            fatalError("no such priority")
+        }
+        
+        let deadline = calendarSwitch.isOn ? deadline : nil
+        
+        let now = Date.now
+        
+        if let item = item {
+            self.item = ToDoItem(id: item.id, text: toDoText.text, priority: priority, createdAt: item.createdAt, deadline: deadline, done: item.done, modifiedAt: now)
+            return
+        }
+
+        item = ToDoItem(text: toDoText.text, priority: priority, createdAt: now, deadline: deadline, modifiedAt: now)
     }
     
     // MARK: -Constants
@@ -378,6 +457,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             static let supporNavBar = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 0.8)
             static let separatorColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.2)
             static let labelTertiary = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.3)
+            static let labelPrimary = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
         }
         
         struct Fonts {
@@ -499,5 +579,21 @@ Monsieur прогнали со двора.
 Отец понять его не мог
 И земли отдавал в залог.
 """
+    }
+}
+
+
+extension ToDoItem.Priority {
+    static func makePriorityFromSelectedSegmentIndex(_ index: Int) -> ToDoItem.Priority? {
+        if index == 0 {
+            return .low
+        }
+        if index == 1 {
+            return .normal
+        }
+        if index == 2 {
+            return .high
+        }
+        return nil
     }
 }
