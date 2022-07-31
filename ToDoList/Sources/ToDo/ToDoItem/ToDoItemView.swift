@@ -13,9 +13,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     
     // MARK: - Views
     private lazy var vStackView: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
-        view.translatesAutoresizingMaskIntoConstraints = false
+        let view = makeVStackView()
         view.spacing = Constants.defaultOffset
         return view
     }()
@@ -111,11 +109,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }()
     
     private lazy var doBeforeLabelAndCalendarButton: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
-        view.translatesAutoresizingMaskIntoConstraints = false
-//        view.spacing = 20
-        return view
+        makeVStackView()
     }()
     
     private lazy var priorityLabel: UILabel = {
@@ -140,27 +134,20 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }()
     
     private lazy var prioritySwitchAndLabel: UIStackView = {
-        let view = UIStackView()
-        view.axis = .horizontal
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+        makeHStackView()
     }()
     
     private lazy var calendarButtonAndSwitch: UIStackView = {
-        let view = UIStackView()
-        view.axis = .horizontal
+        let view = makeHStackView()
         view.layer.cornerRadius = Constants.cornerRadius
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.alignment = .center
         return view
     }()
     
     private lazy var lowerSectionVstackView: UIStackView = {
-        let view = UIStackView()
-        view.axis = .vertical
+        let view = makeVStackView()
         view.backgroundColor = Constants.Colors.secondary
         view.layer.cornerRadius = Constants.cornerRadius
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.distribution = .fill
         view.spacing = Constants.defaultOffset
         
@@ -182,6 +169,12 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         bar.translatesAutoresizingMaskIntoConstraints = false
         bar.backgroundColor = Constants.Colors.supporNavBar
         return bar
+    }()
+    
+    private lazy var switchSection: UIStackView = {
+        let view = makeVStackView()
+        view.spacing = Constants.defaultOffset
+        return view
     }()
     
     // MARK: - Properties
@@ -224,10 +217,10 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         
         prioritySwitchAndLabel.addArrangedSubviews(priorityLabel, prioritySwitch)
 
+        switchSection.addArrangedSubviews(prioritySwitchAndLabel, dividerView1, calendarButtonAndSwitch)
+        
         lowerSectionVstackView.addArrangedSubviews(
-            prioritySwitchAndLabel,
-            dividerView1,
-            calendarButtonAndSwitch,
+            switchSection,
             dividerView2,
             calendar
         )
@@ -238,22 +231,29 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             deleteButton
         )
         
-        addSubviews(navigationBar, vStackView)
+        addSubviews(vStackView, navigationBar)
     }
     
     private func setUpConstraints() {
+        
         NSLayoutConstraint.activate([
             navigationBar.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
             navigationBar.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
             navigationBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            navigationBar.widthAnchor.constraint(equalToConstant: Constants.navigationBarWidth),
+            
+            switchSection.heightAnchor.constraint(equalToConstant: Constants.switchSectionHeight),
+            prioritySwitchAndLabel.heightAnchor.constraint(equalTo: calendarButtonAndSwitch.heightAnchor),
+            toDoText.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textViewMinHeight),
+            lowerSectionVstackView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.lowerSectionMaxHeight),
             
             vStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: Constants.defaultOffset),
             vStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -Constants.defaultOffset),
-            vStackView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor),
-            vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+            vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.textViewTopAnchor),
+            deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),
 
-            dividerView1.heightAnchor.constraint(equalToConstant: 1),
-            dividerView2.heightAnchor.constraint(equalToConstant: 1)
+            dividerView1.heightAnchor.constraint(equalToConstant: Constants.dividerHeight),
+            dividerView2.heightAnchor.constraint(equalToConstant: Constants.dividerHeight)
         ])
     }
     
@@ -300,7 +300,6 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }
     
     private var enoughInfoFilled: Bool {
-//        textLabelNotEmpty && calendarSwitch.isOn
         textLabelNotEmpty
     }
     
@@ -321,22 +320,38 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     
     private func getDivider() -> UIView {
         let view = UIView()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = Constants.Colors.separatorColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }
-    
     
     private var dateStr: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd MMMM YYYY"
         return dateFormatter.string(from: deadline)
-        
     }
     
     private func updateSelectedDate() {
         calendar.date = deadline
         calendarButton.setTitle(dateStr, for: .normal)
+    }
+    
+    private func makeVStackView() -> UIStackView {
+        let view = makeStackView()
+        view.axis = .vertical
+        return view
+    }
+    
+    private func makeHStackView() -> UIStackView {
+        let view = makeStackView()
+        view.axis = .horizontal
+        return view
+    }
+    
+    private func makeStackView() -> UIStackView {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }
     
     private lazy var initialDeadline: Date = {
@@ -467,121 +482,19 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         
         static let defaultOffset: CGFloat = 16
         static let cornerRadius: CGFloat = 20
-        
+        static let textViewMinHeight: CGFloat = 120
+        static let textViewMaxHeight: CGFloat = 484
+        static let navBarHeight: CGFloat = 56
+        static let lowerSectionMaxHeight: CGFloat = 449
+        static let deleteButttonHeight: CGFloat = 56
+        static let dividerHeight: CGFloat = 0.5
+        static let switchSectionHeight: CGFloat = 112.5
+        static let navigationBarWidth: CGFloat = 375
+        static let textViewTopAnchor: CGFloat = 72
         
         static let textViewPlaceholder = "Что надо сделать?"
-        static let mockText1 = "shit"
-        
-        static let mockText =
-"""
-«Мой дядя самых честных правил,
-Когда не в шутку занемог,
-Он уважать себя заставил
-И лучше выдумать не мог.
-Его пример другим наука;
-Но, боже мой, какая скука
-С больным сидеть и день и ночь,
-Не отходя ни шагу прочь!
-Какое низкое коварство
-Полуживого забавлять,
-Ему подушки поправлять,
-Печально подносить лекарство,
-Вздыхать и думать про себя:
-Когда же черт возьмет тебя!»
-
-Так думал молодой повеса,
-Летя в пыли на почтовых,
-Всевышней волею Зевеса
-Наследник всех своих родных.
-Друзья Людмилы и Руслана!
-С героем моего романа
-Без предисловий, сей же час
-Позвольте познакомить вас:
-Онегин, добрый мой приятель,
-Родился на брегах Невы,
-Где, может быть, родились вы
-Или блистали, мой читатель;
-Там некогда гулял и я:
-Но вреден север для меня.
-
-Служив отлично благородно,
-Долгами жил его отец,
-Давал три бала ежегодно
-И промотался наконец.
-Судьба Евгения хранила:
-Сперва Madame за ним ходила,
-Потом Monsieur ее сменил.
-Ребенок был резов, но мил.
-Monsieur l'Abbé, француз убогой,
-Чтоб не измучилось дитя,
-Учил его всему шутя,
-Не докучал моралью строгой,
-Слегка за шалости бранил
-И в Летний сад гулять водил.
-
-Когда же юности мятежной
-Пришла Евгению пора,
-Пора надежд и грусти нежной,
-Monsieur прогнали со двора.
-Вот мой Онегин на свободе;
-Острижен по последней моде,
-Как dandy лондонский одет —
-И наконец увидел свет.
-Он по-французски совершенно
-Мог изъясняться и писал;
-Легко мазурку танцевал
-И кланялся непринужденно;
-Чего ж вам больше? Свет решил,
-Что он умен и очень мил.
-
-Мы все учились понемногу
-Чему-нибудь и как-нибудь,
-Так воспитаньем, слава богу,
-У нас немудрено блеснуть.
-Онегин был по мненью многих
-(Судей решительных и строгих)
-Ученый малый, но педант:
-Имел он счастливый талант
-Без принужденья в разговоре
-Коснуться до всего слегка,
-С ученым видом знатока
-Хранить молчанье в важном споре
-И возбуждать улыбку дам
-Огнем нежданных эпиграмм.
-
-Латынь из моды вышла ныне:
-Так, если правду вам сказать,
-Он знал довольно по-латыне,
-Чтоб эпиграфы разбирать,
-Потолковать об Ювенале,
-В конце письма поставить vale,
-Да помнил, хоть не без греха,
-Из Энеиды два стиха.
-Он рыться не имел охоты
-В хронологической пыли
-Бытописания земли:
-Но дней минувших анекдоты
-От Ромула до наших дней
-Хранил он в памяти своей.
-
-Высокой страсти не имея
-Для звуков жизни не щадить,
-Не мог он ямба от хорея,
-Как мы ни бились, отличить.
-Бранил Гомера, Феокрита;
-Зато читал Адама Смита
-И был глубокой эконом,
-То есть умел судить о том,
-Как государство богатеет,
-И чем живет, и почему
-Не нужно золота ему,
-Когда простой продукт имеет.
-Отец понять его не мог
-И земли отдавал в залог.
-"""
     }
 }
-
 
 extension ToDoItem.Priority {
     static func makePriorityFromSelectedSegmentIndex(_ index: Int) -> ToDoItem.Priority? {
