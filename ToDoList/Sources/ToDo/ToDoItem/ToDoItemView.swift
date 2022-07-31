@@ -70,6 +70,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         switchButton.isOn = (item?.deadline == nil ? false : true)
         switchButton.addTarget(self, action: #selector(toggleCalendarState), for: .touchUpInside)
         switchButton.translatesAutoresizingMaskIntoConstraints = false
+        switchButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return switchButton
         
     }()
@@ -250,6 +251,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             vStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: Constants.defaultOffset),
             vStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -Constants.defaultOffset),
             vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.textViewTopAnchor),
+            vStackView.bottomAnchor.constraint(lessThanOrEqualTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.defaultOffset),
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),
 
             dividerView1.heightAnchor.constraint(equalToConstant: Constants.dividerHeight),
