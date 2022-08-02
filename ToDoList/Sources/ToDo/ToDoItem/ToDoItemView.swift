@@ -13,7 +13,7 @@ final class ToDoItemView: UIView  {
     
     // MARK: - Views
     private lazy var vStackView: UIStackView = {
-        let view = makeVStackView()
+        let view = UIStackView.makeVStackView()
         view.spacing = Constants.defaultOffset
         return view
     }()
@@ -24,8 +24,8 @@ final class ToDoItemView: UIView  {
         view.layer.cornerRadius = Constants.cornerRadius
         view.translatesAutoresizingMaskIntoConstraints = false
         view.textContainerInset = defaultLayoutMargins
-        view.backgroundColor = Constants.Colors.secondary
-        view.font = Constants.Fonts.body
+        view.backgroundColor = AppConstants.Colors.secondary
+        view.font = AppConstants.Fonts.body
         view.autocorrectionType = .no
         
         view.delegate = module
@@ -38,10 +38,10 @@ final class ToDoItemView: UIView  {
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.tertiaryLabel, for: .disabled)
         button.setTitle("Удалить", for: .normal)
-        button.titleLabel?.font = Constants.Fonts.body
+        button.titleLabel?.font = AppConstants.Fonts.body
         button.titleLabel?.textAlignment = .center
         button.layer.cornerRadius = Constants.cornerRadius
-        button.backgroundColor = Constants.Colors.secondary
+        button.backgroundColor = AppConstants.Colors.secondary
         button.translatesAutoresizingMaskIntoConstraints = false
         
         button.isEnabled = item == nil ? false : true
@@ -53,7 +53,7 @@ final class ToDoItemView: UIView  {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
-        datePicker.backgroundColor = Constants.Colors.secondary
+        datePicker.backgroundColor = AppConstants.Colors.secondary
         datePicker.layer.cornerRadius = Constants.cornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.translatesAutoresizingMaskIntoConstraints = false
@@ -78,7 +78,7 @@ final class ToDoItemView: UIView  {
     private lazy var doBeforeLabel: UILabel = {
         let label = UILabel()
         label.text = "Сделать до"
-        label.font = Constants.Fonts.body
+        label.font = AppConstants.Fonts.body
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -97,9 +97,9 @@ final class ToDoItemView: UIView  {
     private lazy var calendarButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(dateStr, for: .normal)
-        button.titleLabel?.font = Constants.Fonts.footnote
+        button.titleLabel?.font = AppConstants.Fonts.footnote
         button.contentHorizontalAlignment = .left
-        button.backgroundColor = Constants.Colors.secondary
+        button.backgroundColor = AppConstants.Colors.secondary
         button.addTarget(self, action: #selector(switchCalendarState), for: .touchUpInside)
         button.layer.cornerRadius = Constants.cornerRadius
         
@@ -110,13 +110,13 @@ final class ToDoItemView: UIView  {
     }()
     
     private lazy var doBeforeLabelAndCalendarButton: UIStackView = {
-        makeVStackView()
+        UIStackView.makeVStackView()
     }()
     
     private lazy var priorityLabel: UILabel = {
         let label = UILabel()
         label.text = "Важность"
-        label.font = Constants.Fonts.body
+        label.font = AppConstants.Fonts.body
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -142,15 +142,15 @@ final class ToDoItemView: UIView  {
     }()
     
     private lazy var calendarButtonAndSwitch: UIStackView = {
-        let view = makeHStackView()
+        let view = UIStackView.makeHStackView()
         view.layer.cornerRadius = Constants.cornerRadius
         view.alignment = .center
         return view
     }()
     
     private lazy var lowerSectionVstackView: UIStackView = {
-        let view = makeVStackView()
-        view.backgroundColor = Constants.Colors.secondary
+        let view = UIStackView.makeVStackView()
+        view.backgroundColor = AppConstants.Colors.secondary
         view.layer.cornerRadius = Constants.cornerRadius
         view.distribution = .fill
         view.spacing = Constants.defaultOffset
@@ -162,7 +162,7 @@ final class ToDoItemView: UIView  {
     }()
     
     private lazy var switchSection: UIStackView = {
-        let view = makeVStackView()
+        let view = UIStackView.makeVStackView()
         view.spacing = Constants.defaultOffset
         return view
     }()
@@ -217,7 +217,7 @@ final class ToDoItemView: UIView  {
     
     // MARK: - Private Methods
     private func setUp() {
-        backgroundColor = Constants.Colors.backPrimary
+        backgroundColor = AppConstants.Colors.backPrimary
         addViews()
         setUpConstraints()
         loadModel()
@@ -279,7 +279,7 @@ final class ToDoItemView: UIView  {
     private func setUpToDoText() {
         if let item = item {
             toDoText.text = item.text
-            toDoText.textColor = Constants.Colors.labelPrimary
+            toDoText.textColor = AppConstants.Colors.labelPrimary
             return
         }
         setUpTextViewPlaceholder(toDoText)
@@ -319,7 +319,7 @@ final class ToDoItemView: UIView  {
     
     private var textLabelNotEmpty: Bool {
         !(toDoText.text.isEmpty) &&
-        !(toDoText.textColor == Constants.Colors.labelTertiary && toDoText.text == Constants.textViewPlaceholder)
+        !(toDoText.textColor == AppConstants.Colors.labelTertiary && toDoText.text == Constants.textViewPlaceholder)
     }
     
     private lazy var defaultLayoutMargins = UIEdgeInsets(top: Constants.defaultOffset,
@@ -331,7 +331,7 @@ final class ToDoItemView: UIView  {
     
     private func getDivider() -> UIView {
         let view = UIView()
-        view.backgroundColor = Constants.Colors.separatorColor
+        view.backgroundColor = AppConstants.Colors.separatorColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }
@@ -345,24 +345,6 @@ final class ToDoItemView: UIView  {
     private func updateSelectedDate() {
         calendar.date = deadline
         calendarButton.setTitle(dateStr, for: .normal)
-    }
-    
-    private func makeVStackView() -> UIStackView {
-        let view = makeStackView()
-        view.axis = .vertical
-        return view
-    }
-    
-    private func makeHStackView() -> UIStackView {
-        let view = makeStackView()
-        view.axis = .horizontal
-        return view
-    }
-    
-    private func makeStackView() -> UIStackView {
-        let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
     }
     
     private lazy var initialDeadline: Date = {
@@ -435,20 +417,7 @@ final class ToDoItemView: UIView  {
     }
     
     // MARK: - Constants
-    struct Constants {
-        struct Colors {
-            static let secondary = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            static let backPrimary = UIColor(red: 0.97, green: 0.97, blue: 0.95, alpha: 1.0)
-            static let supporNavBar = UIColor(red: 0.98, green: 0.98, blue: 0.98, alpha: 0.8)
-            static let separatorColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.2)
-            static let labelTertiary = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.3)
-            static let labelPrimary = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
-        }
-        
-        struct Fonts {
-            static let body: UIFont = .systemFont(ofSize: 22)
-            static let footnote: UIFont = .systemFont(ofSize: 18, weight: .bold)
-        }
+    private struct Constants {
         
         static let defaultOffset: CGFloat = 16
         static let cornerRadius: CGFloat = 20

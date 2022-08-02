@@ -23,6 +23,7 @@
 		FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F352895A70D00327D32 /* UIView+Extensions.swift */; };
 		FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */; };
 		FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */; };
+		FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		FA755F352895A70D00327D32 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
 		FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
+		FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsColorsConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 				FA2516F6288F56420036D100 /* AppDelegate.swift */,
 				FA3792F928959FC10099B1A8 /* SceneDelegate.swift */,
 				FA251701288F56430036D100 /* LaunchScreen.storyboard */,
+				FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */,
 			);
 			path = Stuff;
 			sourceTree = "<group>";
@@ -352,6 +355,7 @@
 				FA25172D2891D8CA0036D100 /* ToDoItemView.swift in Sources */,
 				FA2516F7288F56420036D100 /* AppDelegate.swift in Sources */,
 				FA251728288F59480036D100 /* ToDoItem.swift in Sources */,
+				FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */,
 				FA25172A28905C930036D100 /* FileCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

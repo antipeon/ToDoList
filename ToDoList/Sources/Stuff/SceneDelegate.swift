@@ -21,8 +21,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         
         let navigationViewController = UINavigationController()
-        navigationViewController.viewControllers = [ToDoListViewController()]
-        
+        let toDoListViewController = ToDoListViewController()
+        toDoListViewController.title = "Мои дела"
+        navigationViewController.viewControllers = [toDoListViewController]
+        toDoListViewController.navigationController?.navigationBar.prefersLargeTitles = true
         window.rootViewController = navigationViewController
         window.makeKeyAndVisible()
     }

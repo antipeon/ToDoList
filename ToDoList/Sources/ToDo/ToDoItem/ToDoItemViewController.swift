@@ -27,10 +27,9 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     // MARK: - Views
     private lazy var toDoItemView = ToDoItemView(module: self, item: item)
     
-    private lazy var item: ToDoItem? = fileCache.toDoItems.last
-    
     // MARK: - Properties
-    private let fileCache: FileCache
+    private let module: ToDoItemModule
+    private let item: ToDoItem?
     
     private var rootView: ToDoItemView {
         guard let view = view as? ToDoItemView else {
@@ -40,9 +39,9 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     }
     
     // MARK: - Init
-    init(fileCache: FileCache) {
-        self.fileCache = fileCache
-        try? fileCache.load(from: filename)
+    init(module: ToDoItemModule, item: ToDoItem?) {
+        self.module = module
+        self.item = item
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -131,23 +130,12 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     
     // MARK: - ToDoItemModule
     func addItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        fileCache.add(item)
-        try? fileCache.save(to: filename)
+        module.addItem(item)
     }
     
     func deleteItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        try? fileCache.save(to: filename)
+        module.deleteItem(item)
     }
-    
-    private let filename = "toDoItems"
 }
 
 extension UIViewController {
