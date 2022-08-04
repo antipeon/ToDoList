@@ -31,9 +31,8 @@ class ToDoListViewController: UIViewController, ToDoListModule {
     
     func showAddItem() {
         let toDoItem = ToDoItemViewController(fileCache: fileCache)
-        self.navigationController?.navigationBar.barTintColor = .cyan
+        let navController = UINavigationController(rootViewController: toDoItem)
         toDoItem.modalPresentationStyle = .automatic
-        navigationController?.present(toDoItem, animated: true)
-        
+        navigationController?.present(navController, animated: true)
     }
 }

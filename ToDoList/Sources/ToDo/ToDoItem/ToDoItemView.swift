@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ToDoItemView: UIView, UITextViewDelegate {
+final class ToDoItemView: UIView  {
     
     typealias Module = ToDoItemModule
     
@@ -28,7 +28,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         view.font = Constants.Fonts.body
         view.autocorrectionType = .no
         
-        view.delegate = self
+        view.delegate = module
         
         return view
     }()
@@ -119,6 +119,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         label.font = Constants.Fonts.body
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
     }()
     
@@ -135,7 +136,9 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }()
     
     private lazy var prioritySwitchAndLabel: UIStackView = {
-        makeHStackView()
+        let view = makeHStackView()
+        view.alignment = .center
+        return view
     }()
     
     private lazy var calendarButtonAndSwitch: UIStackView = {
@@ -156,20 +159,6 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         view.layoutMargins = defaultLayoutMargins
         
         return view
-    }()
-    
-    private lazy var navigationBar: UINavigationBar = {
-        let bar = UINavigationBar()
-        let item = UINavigationItem(title: "Дело")
-        let saveItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
-        saveItem.isEnabled = (self.item == nil ? false : true)
-        let cancelItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismiss))
-        item.rightBarButtonItem = saveItem
-        item.leftBarButtonItem = cancelItem
-        bar.setItems([item], animated: true)
-        bar.translatesAutoresizingMaskIntoConstraints = false
-        bar.backgroundColor = Constants.Colors.supporNavBar
-        return bar
     }()
     
     private lazy var switchSection: UIStackView = {
@@ -199,6 +188,31 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Public Methods
+    func cancel() {
+        module?.dismiss()
+    }
+    
+    func save() {
+        updateModel()
+        module?.addItem(item)
+        module?.dismiss()
+    }
+    
+    func setUpTextViewPlaceholder(_ textView: UITextView) {
+        textView.text = ToDoItemView.Constants.textViewPlaceholder
+        textView.textColor = ToDoItemView.Constants.Colors.labelTertiary
+    }
+    
+    func updateViewsDisplay() {
+        deleteButton.isEnabled = enoughInfoFilled
+        module?.navigationItem.rightBarButtonItem?.isEnabled = enoughInfoFilled
+        calendarButton.isHidden = !dateSelected
+        if !dateSelected {
+            calendar.isHidden = true
+        }
     }
     
     // MARK: - Private Methods
@@ -231,26 +245,24 @@ final class ToDoItemView: UIView, UITextViewDelegate {
             lowerSectionVstackView,
             deleteButton
         )
-        
-        addSubviews(vStackView, navigationBar)
+
+        addSubview(vStackView)
     }
     
     private func setUpConstraints() {
         
         NSLayoutConstraint.activate([
-            navigationBar.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
-            navigationBar.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
-            navigationBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            navigationBar.widthAnchor.constraint(equalToConstant: Constants.navigationBarWidth),
-            
             switchSection.heightAnchor.constraint(equalToConstant: Constants.switchSectionHeight),
             prioritySwitchAndLabel.heightAnchor.constraint(equalTo: calendarButtonAndSwitch.heightAnchor),
+            prioritySwitch.heightAnchor.constraint(equalToConstant: Constants.prioritySwitchHeight),
+            priorityLabel.heightAnchor.constraint(equalToConstant: Constants.priorityLabelHeight),
+
             toDoText.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textViewMinHeight),
             lowerSectionVstackView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.lowerSectionMaxHeight),
             
             vStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: Constants.defaultOffset),
             vStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -Constants.defaultOffset),
-            vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Constants.textViewTopAnchor),
+            vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.defaultOffset),
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),
 
@@ -315,10 +327,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
                                                          bottom: Constants.defaultOffset,
                                                          right: Constants.defaultOffset)
     
-    private func setUpTextViewPlaceholder(_ textView: UITextView) {
-        textView.text = Constants.textViewPlaceholder
-        textView.textColor = Constants.Colors.labelTertiary
-    }
+    
     
     private func getDivider() -> UIView {
         let view = UIView()
@@ -380,23 +389,13 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }
     
     // MARK: - Actions
-    @objc func dismiss() {
-        module?.dismiss()
-    }
-    
-    @objc func save() {
-        updateModel()
-        module?.addItem(item)
-        module?.dismiss()
-    }
-    
-    @objc func deleteItem() {
+    @objc private func deleteItem() {
         updateModel()
         module?.deleteItem(item)
         module?.dismiss()
     }
     
-    @objc func datePickerDateChanged() {
+    @objc private func datePickerDateChanged() {
         deadline = calendar.date
         calendarButton.setTitle(dateStr, for: .normal)
         hideCalendar()
@@ -404,49 +403,18 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         setNeedsDisplay()
     }
     
-    @objc func switchCalendarState() {
+    @objc private func switchCalendarState() {
         toggleCalendar()
         updateViewsDisplay()
         setNeedsDisplay()
     }
     
-    @objc func toggleCalendarState() {
+    @objc private func toggleCalendarState() {
         toggleCalendar()
         deadline = initialDeadline
         updateSelectedDate()
         updateViewsDisplay()
         setNeedsDisplay()
-    }
-    
-    // MARK: - TextViewDelegate
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == Constants.Colors.labelTertiary {
-            textView.text = nil
-            textView.textColor = Constants.Colors.labelPrimary
-        } else {
-            // idk why this === deselection
-            textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument)
-        }
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            setUpTextViewPlaceholder(textView)
-        }
-    }
-    
-    func textViewDidChange(_ textView: UITextView) {
-        updateViewsDisplay()
-        setNeedsDisplay(navigationBar.frame)
-    }
-    
-    private func updateViewsDisplay() {
-        deleteButton.isEnabled = enoughInfoFilled
-        navigationBar.items?.first?.rightBarButtonItem?.isEnabled = enoughInfoFilled
-        calendarButton.isHidden = !dateSelected
-        if !dateSelected {
-            calendar.isHidden = true
-        }
     }
     
     private func updateModel() {
@@ -467,7 +435,7 @@ final class ToDoItemView: UIView, UITextViewDelegate {
     }
     
     // MARK: - Constants
-    private struct Constants {
+    struct Constants {
         struct Colors {
             static let secondary = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
             static let backPrimary = UIColor(red: 0.97, green: 0.97, blue: 0.95, alpha: 1.0)
@@ -491,8 +459,8 @@ final class ToDoItemView: UIView, UITextViewDelegate {
         static let deleteButttonHeight: CGFloat = 56
         static let dividerHeight: CGFloat = 0.5
         static let switchSectionHeight: CGFloat = 112.5
-        static let navigationBarWidth: CGFloat = 375
-        static let textViewTopAnchor: CGFloat = 72
+        static let prioritySwitchHeight: CGFloat = 36
+        static let priorityLabelHeight: CGFloat = 22
         
         static let textViewPlaceholder = "Что надо сделать?"
     }

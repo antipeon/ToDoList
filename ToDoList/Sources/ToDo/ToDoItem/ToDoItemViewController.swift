@@ -17,7 +17,7 @@ extension DismissableModule {
     }
 }
 
-protocol ToDoItemModule: DismissableModule {
+protocol ToDoItemModule: DismissableModule, UITextViewDelegate {
     func addItem(_ item: ToDoItem?)
     func deleteItem(_ item: ToDoItem?)
 }
@@ -31,6 +31,13 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     
     // MARK: - Properties
     private let fileCache: FileCache
+    
+    private var rootView: ToDoItemView {
+        guard let view = view as? ToDoItemView else {
+            fatalError("view not set")
+        }
+        return view
+    }
     
     // MARK: - Init
     init(fileCache: FileCache) {
@@ -51,6 +58,58 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setUpToHideKeyboardOnTapView()
+    }
+    
+    
+    
+    // MARK: - UINavigationController
+    override var navigationItem: UINavigationItem {
+        titleItem
+    }
+    
+    private lazy var saveButton: UIBarButtonItem = {
+        UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(save))
+    }()
+    
+    private lazy var cancelButton: UIBarButtonItem = {
+        UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
+    }()
+    
+    private lazy var titleItem: UINavigationItem = {
+        let item = UINavigationItem(title: "Дело")
+        item.rightBarButtonItem = saveButton
+        item.leftBarButtonItem = cancelButton
+        return item
+    }()
+    
+    // MARK: - TextViewDelegate
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if  textView.textColor == ToDoItemView.Constants.Colors.labelTertiary {
+            textView.text = nil
+            textView.textColor = ToDoItemView.Constants.Colors.labelPrimary
+        } else {
+            // idk why this === deselection
+            textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument)
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            rootView.setUpTextViewPlaceholder(textView)
+        }
+    }
+
+    func textViewDidChange(_ textView: UITextView) {
+        rootView.updateViewsDisplay()
+        rootView.setNeedsDisplay()
+    }
+    
+    @objc private func save() {
+        rootView.save()
+    }
+    
+    @objc private func cancel() {
+        rootView.cancel()
     }
     
     // MARK: - Portrait Mode
