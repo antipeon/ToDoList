@@ -57,7 +57,7 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.setUpToHideKeyboardOnTapView()
+        setUpToHideKeyboardOnTapView()
     }
     
     
