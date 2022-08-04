@@ -11,16 +11,23 @@ protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
     
     func addEmptyItem()
-//    func showAddItem()
+    //    func showAddItem()
 }
 
-class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver {
+class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, UITableViewDelegate, UITableViewDataSource {
     
     struct Constants {
         static let reuseId: String = "Cell"
     }
     
     private let filename = "toDoItems"
+    
+    private var rootView: ToDoListView {
+        guard let view = view as? ToDoListView else {
+            fatalError("view \(String(describing: view)) not initialised")
+        }
+        return view
+    }
     
     private lazy var fileCache: FileCache = {
         let fileCache = FileCache()
@@ -41,17 +48,17 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver {
     
     lazy var showDoneItemsButton: UIButton = {
         let button = UIButton(type: .system)
-//        let button = UIButton(type: .custom)
-//        let systemBlue = UIColor(red: 0, green: 122, blue: 255, alpha: 1)
-//        button.setTitleColor(systemBlue, for: .normal)
-//        button.setTitleColor(systemBlue, for: .selected)
+        //        let button = UIButton(type: .custom)
+        //        let systemBlue = UIColor(red: 0, green: 122, blue: 255, alpha: 1)
+        //        button.setTitleColor(systemBlue, for: .normal)
+        //        button.setTitleColor(systemBlue, for: .selected)
         button.setTitle("Показать", for: .normal)
         button.setTitle("Скрыть", for: .selected)
-//        button.isUserInteractionEnabled = true
-//        becomeFirstResponder()
+        //        button.isUserInteractionEnabled = true
+        //        becomeFirstResponder()
         button.titleLabel?.font = AppConstants.Fonts.subheadBold
         button.addTarget(self, action: #selector(shitAction), for: .touchUpInside)
-
+        
         return button
     }()
     
@@ -66,41 +73,41 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver {
         view.addArrangedSubviews(doneItemsCountLabel, showDoneItemsButton)
         return view
     }()
-
-//    var rootView: ToDoListView {
-//        return (view as! ToDoListView)
-//    }
+    
+    //    var rootView: ToDoListView {
+    //        return (view as! ToDoListView)
+    //    }
     
     override func loadView() {
         view = toDoListView
         view.backgroundColor = AppConstants.Colors.backPrimary
-//        view = UIView()
+        //        view = UIView()
     }
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        setUp()
-//    }
+    //    override func viewDidLoad() {
+    //        super.viewDidLoad()
+    //        setUp()
+    //    }
     
-//    private func setUp() {
-////        view.backgroundColor = .white
-//        view.addSubview(tableView)
-//        tableView.backgroundColor = .white
-//
-//        tableView.register(Cell.self, forCellReuseIdentifier: Constants.reuseId)
-//        tableView.delegate = self
-//        tableView.dataSource = self
-////        tableView.rowHeight = UITableView.automaticDimension
-////        tableView.estimatedRowHeight =  600
-//
-//        tableView.reloadData()
-//    }
-
-//    override func viewDidLayoutSubviews() {
-//        super.viewDidLayoutSubviews()
-//        tableView.frame = view.bounds
-//
-//    }
+    //    private func setUp() {
+    ////        view.backgroundColor = .white
+    //        view.addSubview(tableView)
+    //        tableView.backgroundColor = .white
+    //
+    //        tableView.register(Cell.self, forCellReuseIdentifier: Constants.reuseId)
+    //        tableView.delegate = self
+    //        tableView.dataSource = self
+    ////        tableView.rowHeight = UITableView.automaticDimension
+    ////        tableView.estimatedRowHeight =  600
+    //
+    //        tableView.reloadData()
+    //    }
+    
+    //    override func viewDidLayoutSubviews() {
+    //        super.viewDidLayoutSubviews()
+    //        tableView.frame = view.bounds
+    //
+    //    }
     
     // MARK: - ToDoItemModule
     
@@ -134,19 +141,45 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver {
         presentToDoItemView(with: nil)
     }
     
+    // MARK: - UITableViewDelegate
     
-//    func showAddItem() {
-//        let toDoItem = ToDoItemViewController(fileCache: fileCache)
-//        self.navigationController?.navigationBar.barTintColor = .cyan
-//        toDoItem.modalPresentationStyle = .automatic
-//        navigationController?.present(toDoItem, animated: true)
-//
-//    }
-}
-
-
-// MARK: - UITableViewController
-extension ToDoListViewController: UITableViewDataSource {
+    //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    //        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseId, for: indexPath)
+    //
+    //        guard let cell = cell as? Cell else {
+    //            let h = cell.contentView.bounds.height
+    //            return h
+    //        }
+    //        let h = cell.contentView.bounds.height
+    //        return h
+    //    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        200
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        //        navigationController?.pushViewController(ToDoItemViewController(fileCache: fileCache), animated: true)
+        
+        let item = fileCache.toDoItems[indexPath.row]
+        presentToDoItemView(with: item)
+    }
+    
+    //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    //        "fuck"
+    //    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        doneItemsControl
+    }
+    
+    // MARK: - UITableViewController
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         fileCache.toDoItems.count
     }
@@ -177,70 +210,26 @@ extension ToDoListViewController: UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             
         }
+    }
     func showAddItem() {
-        let toDoItem = ToDoItemViewController(fileCache: fileCache)
-        let navController = UINavigationController(rootViewController: toDoItem)
-        toDoItem.modalPresentationStyle = .automatic
-        navigationController?.present(navController, animated: true)
-    }
-}
-
-extension ToDoListViewController: UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseId, for: indexPath)
-//
-//        guard let cell = cell as? Cell else {
-//            let h = cell.contentView.bounds.height
-//            return h
-//        }
-//        let h = cell.contentView.bounds.height
-//        return h
-//    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        UITableView.automaticDimension
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        200
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-//        navigationController?.pushViewController(ToDoItemViewController(fileCache: fileCache), animated: true)
         
-        let item = fileCache.toDoItems[indexPath.row]
-        presentToDoItemView(with: item)
     }
     
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        "fuck"
-//    }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        doneItemsControl
-    }
-    
-//    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        rootView.showDoneItemsButton.isHidden = true
-//        rootView.doneItemsCountLabel.isHidden = true
-//        rootView.setNeedsLayout()
-//        rootView.layoutIfNeeded()
-//    }
-//
-//    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        rootView.showDoneItemsButton.isHidden = false
-//        rootView.doneItemsCountLabel.isHidden = false
-//        rootView.setNeedsLayout()
-//        rootView.layoutIfNeeded()
-//    }
+    //    func showAddItem() {
+    //        let toDoItem = ToDoItemViewController(fileCache: fileCache)
+    //        self.navigationController?.navigationBar.barTintColor = .cyan
+    //        toDoItem.modalPresentationStyle = .automatic
+    //        navigationController?.present(toDoItem, animated: true)
+    //
+    //    }
     
     // MARK: - ModelObserver
     func didAddItem() {
-//        updateViews()
+        //        updateViews()
     }
     func didRemoveItem() {
-//        updateViews()
+        //        updateViews()
     }
     func didSave() {
         updateViews()
@@ -251,17 +240,23 @@ extension ToDoListViewController: UITableViewDelegate {
     
     // MARK: - Private funcs
     private func updateViews() {
-//        view.setNeedsDisplay()
-//        view.setNeedsLayout()
-//        view.layoutIfNeeded()
-        (view as? ToDoListView)?.tableView.reloadData()
+        //        view.setNeedsDisplay()
+        //        view.setNeedsLayout()
+        //        view.layoutIfNeeded()
+        rootView.reloadData()
     }
     
     private func presentToDoItemView(with item: ToDoItem?) {
-        let controller = ToDoItemViewController(module: self, item: item)
-        self.navigationController?.navigationBar.barTintColor = .cyan
-        controller.modalPresentationStyle = .automatic
-        navigationController?.present(controller, animated: true)
+        let toDoItem = ToDoItemViewController(module: self, item: item)
+        let navController = UINavigationController(rootViewController: toDoItem)
+        
+        toDoItem.modalPresentationStyle = .automatic
+        navigationController?.present(navController, animated: true)
+        
+//        let toDoItem = ToDoItemViewController(fileCache: fileCache)
+//        let navController = UINavigationController(rootViewController: toDoItem)
+//        toDoItem.modalPresentationStyle = .automatic
+//        navigationController?.present(navController, animated: true)
     }
 }
 

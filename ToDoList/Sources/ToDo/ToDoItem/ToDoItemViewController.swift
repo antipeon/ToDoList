@@ -83,9 +83,9 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     
     // MARK: - TextViewDelegate
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if  textView.textColor == ToDoItemView.Constants.Colors.labelTertiary {
+        if  textView.textColor == AppConstants.Colors.labelTertiary {
             textView.text = nil
-            textView.textColor = ToDoItemView.Constants.Colors.labelPrimary
+            textView.textColor = AppConstants.Colors.labelPrimary
         } else {
             // idk why this === deselection
             textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument)

@@ -55,11 +55,11 @@ class ToDoListView: UITableView {
         return button
     }()
     
-    lazy var tableView: UITableView = {
-        let view = UITableView(frame: .zero, style: .insetGrouped)
-        view.layer.cornerRadius = 16
-        return view
-    }()
+//    lazy var tableView: UITableView = {
+//        let view = UITableView(frame: .zero, style: .insetGrouped)
+//        view.layer.cornerRadius = 16
+//        return view
+//    }()
     
 //    lazy var content: UIView = {
 //        let view = UIView()

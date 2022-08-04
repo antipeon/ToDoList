@@ -136,7 +136,7 @@ final class ToDoItemView: UIView  {
     }()
     
     private lazy var prioritySwitchAndLabel: UIStackView = {
-        let view = makeHStackView()
+        let view = UIStackView.makeHStackView()
         view.alignment = .center
         return view
     }()
@@ -203,7 +203,7 @@ final class ToDoItemView: UIView  {
     
     func setUpTextViewPlaceholder(_ textView: UITextView) {
         textView.text = ToDoItemView.Constants.textViewPlaceholder
-        textView.textColor = ToDoItemView.Constants.Colors.labelTertiary
+        textView.textColor = AppConstants.Colors.labelTertiary
     }
     
     func updateViewsDisplay() {
