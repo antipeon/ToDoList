@@ -35,10 +35,10 @@ struct ToDoItem: Identifiable {
         }
     }
     
-    enum Priority: String {
-        case high
-        case normal
+    enum Priority: String, CaseIterable {
         case low
+        case normal
+        case high
     }
 }
 

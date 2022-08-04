@@ -468,15 +468,10 @@ final class ToDoItemView: UIView  {
 
 extension ToDoItem.Priority {
     static func makePriorityFromSelectedSegmentIndex(_ index: Int) -> ToDoItem.Priority? {
-        if index == 0 {
-            return .low
+        let allCases = ToDoItem.Priority.allCases
+        guard index < allCases.count else {
+            return nil
         }
-        if index == 1 {
-            return .normal
-        }
-        if index == 2 {
-            return .high
-        }
-        return nil
+        return allCases[index]
     }
 }
