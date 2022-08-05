@@ -26,6 +26,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         navigationViewController.viewControllers = [toDoListViewController]
         toDoListViewController.navigationController?.navigationBar.prefersLargeTitles = true
         window.rootViewController = navigationViewController
+        
+        let style = NSMutableParagraphStyle()
+        style.firstLineHeadIndent = 32
+        UINavigationBar.appearance().largeTitleTextAttributes = [
+            NSAttributedString.Key.paragraphStyle: style
+        ]
+        
         window.makeKeyAndVisible()
     }
 

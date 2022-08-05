@@ -24,6 +24,9 @@
 		FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */; };
 		FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */; };
 		FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */; };
+		FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */; };
+		FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */; };
+		FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED3289DD449008A6690 /* LastCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +68,9 @@
 		FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
 		FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
 		FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsColorsConstants.swift; sourceTree = "<group>"; };
+		FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListHeaderView.swift; sourceTree = "<group>"; };
+		FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListCellView.swift; sourceTree = "<group>"; };
+		FAB72ED3289DD449008A6690 /* LastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,10 +215,21 @@
 		FA755F372895A7BD00327D32 /* ToDoList */ = {
 			isa = PBXGroup;
 			children = (
+				FAB72ECE289DD361008A6690 /* HelperViews */,
 				FA755F322895A29D00327D32 /* ToDoListView.swift */,
 				FA2516FA288F56420036D100 /* ToDoListViewController.swift */,
 			);
 			path = ToDoList;
+			sourceTree = "<group>";
+		};
+		FAB72ECE289DD361008A6690 /* HelperViews */ = {
+			isa = PBXGroup;
+			children = (
+				FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */,
+				FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */,
+				FAB72ED3289DD449008A6690 /* LastCell.swift */,
+			);
+			path = HelperViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -345,9 +362,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
+				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
+				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
 				FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */,
 				FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */,
 				FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */,

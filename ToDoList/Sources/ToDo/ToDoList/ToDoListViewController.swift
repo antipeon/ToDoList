@@ -9,6 +9,8 @@ import UIKit
 
 protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
+    var notDoneItems: [ToDoItem] { get }
+    
     
     func addEmptyItem()
     //    func showAddItem()
@@ -37,57 +39,48 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     }()
     
     private lazy var toDoListView = ToDoListView(module: self)
+
+    @objc func toggleShowOnlyDone() {
+        showOnlyNotDone.toggle()
+//        print("someting")
+//        guard let header = rootView.dequeueReusableHeaderFooterView(withIdentifier: Header.Constants.reuseIdentifier) as? Header else {
+//            fatalError("str")
+//        }
+//        header.doneItemsCountLabel.text = "Выполнен"
+    }
     
-    lazy var doneItemsCountLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Выполнено -- \(doneItemsCount)"
-        label.textColor = AppConstants.Colors.labelTertiary
-        label.font = AppConstants.Fonts.subhead
-        return label
-    }()
+    override func loadView() {
+        super.loadView()
+        view = toDoListView
+        view.backgroundColor = AppConstants.Colors.backPrimary
+    }
     
-    lazy var showDoneItemsButton: UIButton = {
-        let button = UIButton(type: .system)
-        //        let button = UIButton(type: .custom)
-        //        let systemBlue = UIColor(red: 0, green: 122, blue: 255, alpha: 1)
-        //        button.setTitleColor(systemBlue, for: .normal)
-        //        button.setTitleColor(systemBlue, for: .selected)
-        button.setTitle("Показать", for: .normal)
-        button.setTitle("Скрыть", for: .selected)
-        //        button.isUserInteractionEnabled = true
-        //        becomeFirstResponder()
-        button.titleLabel?.font = AppConstants.Fonts.subheadBold
-        button.addTarget(self, action: #selector(shitAction), for: .touchUpInside)
-        
+    lazy var addNewItemButton: UIButton = {
+        let button = UIButton()
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: 44, weight: .bold, scale: .large)
+        let buttonImage = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)
+        button.setImage(buttonImage, for: .normal)
+        button.addTarget(self, action: #selector(addEmptyItem), for: .touchUpInside)
         return button
     }()
     
-    @objc func shitAction() {
-        print("fuck")
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpAddNewItemButton()
+        
+        rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
     }
     
-    lazy var doneItemsControl: UIStackView = {
-        let view = UIStackView()
-        view.axis = .horizontal
-        view.alignment = .center
-        view.addArrangedSubviews(doneItemsCountLabel, showDoneItemsButton)
-        return view
-    }()
-    
-    //    var rootView: ToDoListView {
-    //        return (view as! ToDoListView)
-    //    }
-    
-    override func loadView() {
-        view = toDoListView
-        view.backgroundColor = AppConstants.Colors.backPrimary
-        //        view = UIView()
+    private func setUpAddNewItemButton() {
+        view.addSubview(addNewItemButton)
+        addNewItemButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            addNewItemButton.widthAnchor.constraint(equalToConstant: 44),
+            addNewItemButton.heightAnchor.constraint(equalToConstant: 44),
+            addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
-    
-    //    override func viewDidLoad() {
-    //        super.viewDidLoad()
-    //        setUp()
-    //    }
     
     //    private func setUp() {
     ////        view.backgroundColor = .white
@@ -108,6 +101,8 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     //        tableView.frame = view.bounds
     //
     //    }
+    
+    
     
     // MARK: - ToDoItemModule
     
@@ -137,23 +132,29 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
             .count
     }
     
-    func addEmptyItem() {
+    var notDoneItems: [ToDoItem] {
+        fileCache.toDoItems
+            .filter {
+                !$0.done
+            }
+            .orderedByDate()
+    }
+    
+    private var showOnlyNotDone = true {
+        didSet {
+            rootView.reloadSections(IndexSet.init(integer: 0), with: .automatic)
+        }
+    }
+    
+    private var displayedItems: [ToDoItem] {
+        (showOnlyNotDone ? notDoneItems : fileCache.toDoItems.orderedByDate())
+    }
+    
+    @objc func addEmptyItem() {
         presentToDoItemView(with: nil)
     }
     
     // MARK: - UITableViewDelegate
-    
-    //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    //        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseId, for: indexPath)
-    //
-    //        guard let cell = cell as? Cell else {
-    //            let h = cell.contentView.bounds.height
-    //            return h
-    //        }
-    //        let h = cell.contentView.bounds.height
-    //        return h
-    //    }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         UITableView.automaticDimension
     }
@@ -162,11 +163,21 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         200
     }
     
+    func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        if tableView.isLastRowAt(indexPath) {
+            return false
+        }
+        return true
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        //        navigationController?.pushViewController(ToDoItemViewController(fileCache: fileCache), animated: true)
         
-        let item = fileCache.toDoItems[indexPath.row]
+        if tableView.isLastRowAt(indexPath) {
+            return
+        }
+        
+        let item = displayedItems[indexPath.row]
         presentToDoItemView(with: item)
     }
     
@@ -175,61 +186,159 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     //    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        doneItemsControl
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: Header.Constants.reuseIdentifier)
+        guard let header = view as? Header else {
+            return view
+        }
+        
+        header.doneItemsCountLabel.text = "Выполнено – \(doneItemsCount)"
+        header.showDoneItemsButton.setTitle(showOnlyNotDone ? "Показать" : "Скрыть", for: .normal)
+        header.showDoneItemsButton.addTarget(self, action: #selector(toggleShowOnlyDone), for: .touchUpInside)
+        return header
     }
     
-    // MARK: - UITableViewController
     
+    private var swipedRow: IndexPath?
+    
+    func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
+        swipedRow = indexPath
+    }
+    
+    func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+        swipedRow = nil
+    }
+    
+    // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        fileCache.toDoItems.count
+        displayedItems.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseId, for: indexPath)
         
         guard let cell = cell as? Cell else {
+//            guard let _ = cell as? LastCell else {
+//                return cell
+//            }
+//
+//            return LastCell()
             return cell
         }
         
-        let item = fileCache.toDoItems[indexPath.row]
+        if tableView.isLastRowAt(indexPath) {
+            return LastCell()
+        }
+        
+        let item = displayedItems[indexPath.row]
         
         setUpCell(cell, with: item)
         
         return cell
     }
     
-    private func setUpCell(_ cell: Cell, with item: ToDoItem) {
-        cell.setToDoText(with: item.text)
-        cell.setDeadline(with: item.deadline)
-        cell.setPriority(with: item.priority)
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if tableView.isLastRowAt(indexPath) {
+            return nil
+        }
+        let config = UISwipeActionsConfiguration(actions: [deleteAction, infoAction])
+        config.performsFirstActionWithFullSwipe = false
+        return config
+    }
+    
+    // remove default trailing action = delete
+    func tableView(_ tableView: UITableView,
+                   editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if tableView.isLastRowAt(indexPath) {
+            return nil
+        }
+        let config = UISwipeActionsConfiguration(actions: [doneAction])
+        config.performsFirstActionWithFullSwipe = false
+        return config
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if tableView.isLastRowAt(indexPath) {
+            return
+        }
+        
         if editingStyle == .delete {
-            fileCache.remove(fileCache.toDoItems[indexPath.row])
+            fileCache.remove(displayedItems[indexPath.row])
             tableView.deleteRows(at: [indexPath], with: .fade)
-            
         }
     }
-    func showAddItem() {
-        
+    
+    //MARK: - SwipeActions
+    lazy var deleteAction: UIContextualAction = {
+        let action = UIContextualAction(style: .normal, title: nil) {
+            [weak self] (action, view, completionHandler) in
+            self?.deleteSwipedItem()
+            completionHandler(true)
+        }
+        action.image = UIImage(systemName: "trash.fill")
+        action.backgroundColor = .red
+        return action
+    }()
+    
+    lazy var infoAction: UIContextualAction = {
+        let action = UIContextualAction(style: .normal, title: nil) {
+            [weak self] (action, view, completionHandler) in
+            self?.infoSwiped()
+            completionHandler(true)
+        }
+        action.image = UIImage(systemName: "info.circle.fill")
+        action.backgroundColor = AppConstants.Colors.lightGray
+        return action
+    }()
+    
+    lazy var doneAction: UIContextualAction = {
+        let action = UIContextualAction(style: .normal, title: "done") {
+            [weak self] (action, view, completionHandler) in
+            self?.moveSwipedItemToDone(in: view)
+            completionHandler(true)
+        }
+        action.image = UIImage(systemName: "checkmark.circle.fill")
+//        action.backgroundColor = AppConstants.Colors.lightGreen
+        action.backgroundColor = .systemGreen
+        return action
+    }()
+    
+    func deleteSwipedItem() {
+        print("deleted")
+        guard let swipedRow = swipedRow else {
+            return
+        }
+        let item = displayedItems[swipedRow.row]
+        deleteItem(item)
     }
     
+    func infoSwiped() {
+        print("do nothing")
+    }
     
-    //    func showAddItem() {
-    //        let toDoItem = ToDoItemViewController(fileCache: fileCache)
-    //        self.navigationController?.navigationBar.barTintColor = .cyan
-    //        toDoItem.modalPresentationStyle = .automatic
-    //        navigationController?.present(toDoItem, animated: true)
-    //
-    //    }
+    func moveSwipedItemToDone(in view: UIView) {
+        print("done")
+        guard let swipedRow = swipedRow else {
+            return
+        }
+        
+//        cell.setDone(with: true)
+        let item = displayedItems[swipedRow.row]
+        let newItem = ToDoItem(id: item.id, text: item.text, priority: item.priority, createdAt: item.createdAt, deadline: item.deadline, done: true, modifiedAt: item.modifiedAt)
+        addItem(newItem)
+        
+//        rootView.reloadData()
+    }
     
     // MARK: - ModelObserver
     func didAddItem() {
-        //        updateViews()
+//                updateViews()
     }
     func didRemoveItem() {
-        //        updateViews()
+//                updateViews()
     }
     func didSave() {
         updateViews()
@@ -246,6 +355,13 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         rootView.reloadData()
     }
     
+    private func setUpCell(_ cell: Cell, with item: ToDoItem) {
+        cell.setDone(with: item.done)
+        cell.setToDoText(with: item)
+        cell.setDeadline(with: item.deadline)
+        cell.setPriority(with: item.priority)
+    }
+    
     private func presentToDoItemView(with item: ToDoItem?) {
         let toDoItem = ToDoItemViewController(module: self, item: item)
         let navController = UINavigationController(rootViewController: toDoItem)
@@ -260,4 +376,17 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     }
 }
 
+extension Array where Element == ToDoItem {
+    func orderedByDate() -> [ToDoItem] {
+        self.sorted(by: {
+            $0.createdAt < $1.createdAt
+        })
+    }
+}
 
+
+extension UITableView {
+    func isLastRowAt(_ indexPath: IndexPath) -> Bool {
+        return indexPath.row == self.numberOfRows(inSection: 0) - 1
+    }
+}

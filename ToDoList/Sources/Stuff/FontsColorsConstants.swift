@@ -16,6 +16,8 @@ struct AppConstants {
         static let separatorColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.2)
         static let labelTertiary = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.3)
         static let labelPrimary = UIColor(red: 0, green: 0, blue: 0, alpha: 1)
+        static let lightGray = UIColor(red: 0.82, green: 0.82, blue: 0.84, alpha: 1.0)
+        static let lightGreen = UIColor(red: 52, green: 199, blue: 89, alpha: 91)
     }
     
     struct Fonts {

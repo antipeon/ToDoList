@@ -300,7 +300,11 @@ final class ToDoItemView: UIView  {
     
     private func toggleCalendar() {
         calendar.isHidden.toggle()
-        dividerView2.isHidden.toggle()
+        dividerView2.isHidden = calendar.isHidden
+    }
+    
+    private func toggleCalendarSwitch() {
+        calendar.isHidden.toggle()
     }
     
     private func showCalendar() {
@@ -393,6 +397,7 @@ final class ToDoItemView: UIView  {
     
     @objc private func toggleCalendarState() {
         toggleCalendar()
+//        toggleCalendarSwitch()
         deadline = initialDeadline
         updateSelectedDate()
         updateViewsDisplay()
