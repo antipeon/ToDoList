@@ -14,7 +14,7 @@ protocol ToDoListModule: ToDoItemModule {
 
 class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
     
-    // MARK: init
+    // MARK: - init
     init(model: ToDoListModel) {
         self.model = model
         super.init(nibName: nil, bundle: nil)
@@ -176,8 +176,8 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
         }
         
         let item = displayedItems[indexPath.row]
-        
-        setUpCell(cell, with: item)
+
+        cell.setUpCell(with: item)
         
         return cell
     }
@@ -236,13 +236,11 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
             completionHandler(true)
         }
         action.image = UIImage(systemName: "checkmark.circle.fill")
-//        action.backgroundColor = AppConstants.Colors.lightGreen
         action.backgroundColor = .systemGreen
         return action
     }()
     
     private func deleteSwipedItem() {
-        print("deleted")
         guard let swipedRow = swipedRow else {
             return
         }
@@ -256,7 +254,6 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
     }
     
     private func moveSwipedItemToDone(in view: UIView) {
-        print("done")
         guard let swipedRow = swipedRow else {
             return
         }
@@ -272,13 +269,6 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
         rootView.reloadData()
     }
     
-    private func setUpCell(_ cell: Cell, with item: ToDoItem) {
-        cell.setDone(with: item.done)
-        cell.setToDoText(with: item)
-        cell.setDeadline(with: item.deadline)
-        cell.setPriority(with: item.priority)
-    }
-    
     private func presentToDoItemView(with item: ToDoItem?) {
         let toDoItem = ToDoItemViewController(module: self, item: item)
         let navController = UINavigationController(rootViewController: toDoItem)
@@ -290,13 +280,17 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
     private func setUpAddNewItemButton() {
         view.addSubview(addNewItemButton)
         addNewItemButton.translatesAutoresizingMaskIntoConstraints = false
-        let newItemButtonSize: CGFloat = 44
+        
         NSLayoutConstraint.activate([
-            addNewItemButton.widthAnchor.constraint(equalToConstant: newItemButtonSize),
-            addNewItemButton.heightAnchor.constraint(equalToConstant: newItemButtonSize),
+            addNewItemButton.widthAnchor.constraint(equalToConstant: Constants.newItemButtonSize),
+            addNewItemButton.heightAnchor.constraint(equalToConstant: Constants.newItemButtonSize),
             addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+    
+    private enum Constants {
+        static let newItemButtonSize: CGFloat = 44
     }
 }
 

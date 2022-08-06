@@ -51,7 +51,7 @@ class DeadlineView: UIView {
         UIStackView.makeVStackView()
     }()
     
-    // MARK: Init
+    // MARK: - init
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setUpViews()
@@ -70,14 +70,11 @@ class DeadlineView: UIView {
     }
     
     private func setUpConstraints() {
-        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate(
             calendarButtonAndSwitch.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: PriorityView.Constants.priorityLabelLeftInset),
             calendarButtonAndSwitch.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             calendarButtonAndSwitch.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            calendarButtonAndSwitch.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
-        ])
-        
-        
+            calendarButtonAndSwitch.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor)
+        )
     }
-
 }

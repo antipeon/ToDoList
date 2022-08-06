@@ -35,7 +35,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let style = NSMutableParagraphStyle()
         
-        let navigationBarTitleIndent: CGFloat = 32
+        let navigationBarTitleIndent: CGFloat = 16
         style.firstLineHeadIndent = navigationBarTitleIndent
         UINavigationBar.appearance().largeTitleTextAttributes = [
             NSAttributedString.Key.paragraphStyle: style

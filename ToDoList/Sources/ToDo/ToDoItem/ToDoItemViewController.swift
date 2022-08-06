@@ -23,7 +23,6 @@ protocol ToDoItemModule: DismissableModule {
 }
 
 
-
 class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
     
     // MARK: - Views
@@ -40,7 +39,7 @@ class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelega
         return view
     }
     
-    // MARK: - Init
+    // MARK: - init
     init(module: ToDoItemModule, item: ToDoItem?) {
         self.module = module
         self.item = item
@@ -59,6 +58,7 @@ class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpToHideKeyboardOnTapView()
+        setUpObserversForKeyboard()
     }
     
     
@@ -113,22 +113,17 @@ class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelega
         rootView.cancel()
     }
     
-    // MARK: - Portrait Mode
-    override func viewWillAppear(_ animated: Bool) {
-       super.viewWillAppear(animated)
-       
-       AppUtility.lockOrientation(.portrait)
-       // Or to rotate and lock
-       // AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
-       
-   }
-
-   override func viewWillDisappear(_ animated: Bool) {
-       super.viewWillDisappear(animated)
-       
-       // Don't forget to reset when view is being removed
-       AppUtility.lockOrientation(.all)
-   }
+    // MARK: - Landscape/Portrait Mode
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        if UIDevice.current.orientation.isLandscape {
+            rootView.lowerSectionVstackView.isHidden = true
+            rootView.deleteButton.isHidden = true
+        } else {
+            rootView.lowerSectionVstackView.isHidden = false
+            rootView.deleteButton.isHidden = false
+        }
+    }
     
     // MARK: - ToDoItemModule
     func addItem(_ item: ToDoItem?) throws {
@@ -137,6 +132,32 @@ class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelega
     
     func deleteItem(_ item: ToDoItem?) throws {
         try module.deleteItem(item)
+    }
+    
+    // MARK: - Keyboard
+    private func setUpObserversForKeyboard() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+
+            self.view.frame.origin.y = -keyboardSize.height
+            NSLayoutConstraint.deactivate(rootView.viewTopAnchor)
+            rootView.viewTopAnchor = rootView.vStackView.topAnchor.constraint(equalTo: rootView.layoutMarginsGuide.topAnchor, constant: keyboardSize.height)
+            NSLayoutConstraint.activate(rootView.viewTopAnchor)
+            rootView.updateConstraints()
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        self.view.frame.origin.y = 0
+        
+        NSLayoutConstraint.deactivate(rootView.viewTopAnchor)
+        rootView.viewTopAnchor = rootView.vStackView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor)
+        NSLayoutConstraint.activate(rootView.viewTopAnchor)
+        rootView.updateConstraints()
     }
 }
 

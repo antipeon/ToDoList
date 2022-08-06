@@ -12,6 +12,7 @@ class PriorityView: UIView {
         static let prioritySwitchHeight: CGFloat = 36
         static let priorityLabelHeight: CGFloat = 22
         static let priorityLabelLeftInset: CGFloat = 10
+        static let prioritySwitchWidth: CGFloat = 150
     }
     
     // MARK: - Views
@@ -43,7 +44,7 @@ class PriorityView: UIView {
         return view
     }()
     
-    // MARK: Init
+    // MARK: - init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUp()
@@ -53,7 +54,7 @@ class PriorityView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Private funcs
+    // MARK: - Private funcs
     private func setUp() {
         prioritySwitchAndLabel.addArrangedSubviews(priorityLabel, prioritySwitch)
         addSubview(prioritySwitchAndLabel)
@@ -61,7 +62,7 @@ class PriorityView: UIView {
     }
     
     private func setUpConstraints() {
-        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate(
             prioritySwitchAndLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: Constants.priorityLabelLeftInset),
             prioritySwitchAndLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             prioritySwitchAndLabel.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
@@ -69,10 +70,10 @@ class PriorityView: UIView {
             
             prioritySwitch.heightAnchor.constraint(equalToConstant: Constants.prioritySwitchHeight),
             priorityLabel.heightAnchor.constraint(equalToConstant: Constants.priorityLabelHeight),
-        ])
-        
+            
+            
+            prioritySwitch.leftAnchor.constraint(equalTo: priorityLabel.rightAnchor),
+            prioritySwitch.widthAnchor.constraint(lessThanOrEqualToConstant: Constants.prioritySwitchWidth)
+        )
     }
-    
-    
-
 }

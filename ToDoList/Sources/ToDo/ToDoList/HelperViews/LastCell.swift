@@ -15,6 +15,7 @@ class LastCell: UITableViewCell {
         static var leftAndRightInset: CGFloat = 16
     }
     
+    // MARK: - Views
     private lazy var footer: UIView = {
         let label = UILabel()
         label.text = "Новое"
@@ -34,12 +35,13 @@ class LastCell: UITableViewCell {
         return view
     }()
     
+    // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
         contentView.addSubview(containerView)
         
-        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate(
             containerView.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
             containerView.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
             containerView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
@@ -49,8 +51,8 @@ class LastCell: UITableViewCell {
             footer.topAnchor.constraint(equalTo: containerView.topAnchor),
             footer.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
             footer.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            footer.widthAnchor.constraint(equalToConstant: Constants.footerWidth),
-        ])
+            footer.widthAnchor.constraint(equalToConstant: Constants.footerWidth)
+        )
     }
     
     required init?(coder: NSCoder) {

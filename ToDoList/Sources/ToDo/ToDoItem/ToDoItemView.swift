@@ -12,13 +12,13 @@ final class ToDoItemView: UIView  {
     typealias Module = ToDoItemModule & UITextViewDelegate
     
     // MARK: - Views
-    private lazy var vStackView: UIStackView = {
+    lazy var vStackView: UIStackView = {
         let view = UIStackView.makeVStackView()
         view.spacing = Constants.defaultOffset
         return view
     }()
     
-    private lazy var toDoText: UITextView = {
+    lazy var toDoText: UITextView = {
         let view = UITextView()
         view.textAlignment = .left
         view.layer.cornerRadius = Constants.cornerRadius
@@ -33,7 +33,7 @@ final class ToDoItemView: UIView  {
         return view
     }()
     
-    private lazy var deleteButton: UIButton = {
+    lazy var deleteButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.tertiaryLabel, for: .disabled)
@@ -71,7 +71,7 @@ final class ToDoItemView: UIView  {
         return divider
     }()
     
-    private lazy var lowerSectionVstackView: UIStackView = {
+    lazy var lowerSectionVstackView: UIStackView = {
         let view = UIStackView.makeVStackView()
         view.backgroundColor = AppConstants.Colors.secondary
         view.layer.cornerRadius = Constants.cornerRadius
@@ -161,25 +161,24 @@ final class ToDoItemView: UIView  {
 
         addSubview(vStackView)
     }
+
+    lazy var viewTopAnchor = vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor)
     
     private func setUpConstraints() {
-        
-        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate(
             switchSection.heightAnchor.constraint(equalToConstant: Constants.switchSectionHeight),
-            
 
-            toDoText.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textViewMinHeight),
             lowerSectionVstackView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.lowerSectionMaxHeight),
             
             vStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: Constants.defaultOffset),
             vStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -Constants.defaultOffset),
-            vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            viewTopAnchor,
             vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.defaultOffset),
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),
 
             
             dividerView2.heightAnchor.constraint(equalToConstant: Constants.dividerHeight)
-        ])
+        )
     }
     
     private func loadModel() {

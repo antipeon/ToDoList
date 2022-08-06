@@ -17,7 +17,6 @@ class ToDoListModel {
     private static let fileName = "toDoItems"
     private var fileCache: FileCache
     
-    
     // MARK: - API
     var items: [ToDoItem] {
         fileCache.toDoItems

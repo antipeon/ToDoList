@@ -13,7 +13,6 @@ class SwitchSectionView: UIView {
     // MARK: - Views
     private lazy var switchSection: UIStackView = {
         let view = UIStackView.makeVStackView()
-//        view.spacing = Constants.defaultOffset
         return view
     }()
     
@@ -25,7 +24,7 @@ class SwitchSectionView: UIView {
         ToDoItemView.getDivider()
     }()
     
-    // MARK: Init
+    // MARK: - init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUpViews()
@@ -42,16 +41,14 @@ class SwitchSectionView: UIView {
     }
     
     private func setUpConstraints() {
-        NSLayoutConstraint.activate([
+        NSLayoutConstraint.activate(
             dividerView1.heightAnchor.constraint(equalToConstant: ToDoItemView.Constants.dividerHeight),
             prioritySwitchAndLabel.heightAnchor.constraint(equalTo: deadlineView.heightAnchor),
             
             switchSection.leftAnchor.constraint(equalTo: leftAnchor),
             switchSection.rightAnchor.constraint(equalTo: rightAnchor),
             switchSection.bottomAnchor.constraint(equalTo: bottomAnchor),
-            switchSection.topAnchor.constraint(equalTo: topAnchor),
-        ])
-        
+            switchSection.topAnchor.constraint(equalTo: topAnchor)
+        )
     }
-
 }

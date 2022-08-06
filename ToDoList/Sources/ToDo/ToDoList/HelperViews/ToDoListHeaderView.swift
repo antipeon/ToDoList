@@ -13,6 +13,7 @@ class Header: UITableViewHeaderFooterView {
         static let reuseIdentifier = "headerId"
     }
     
+    // MARK: - init
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setUpViews()
@@ -45,7 +46,8 @@ class Header: UITableViewHeaderFooterView {
         return button
     }()
     
-    func setUpViews() {
+    // MARK: - Private funcs
+    private func setUpViews() {
         showDoneItemsButton.translatesAutoresizingMaskIntoConstraints = false
         doneItemsCountLabel.translatesAutoresizingMaskIntoConstraints = false
         doneItemsControl.translatesAutoresizingMaskIntoConstraints = false
@@ -53,13 +55,15 @@ class Header: UITableViewHeaderFooterView {
         doneItemsControl.addArrangedSubviews(doneItemsCountLabel, showDoneItemsButton)
         contentView.addSubview(doneItemsControl)
         
-        let inset: CGFloat = 0
-        
-        NSLayoutConstraint.activate([
-            doneItemsControl.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor, constant: inset),
-            doneItemsControl.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor, constant: -inset),
+        NSLayoutConstraint.activate(
+            doneItemsControl.leftAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leftAnchor),
+            doneItemsControl.rightAnchor.constraint(equalTo: contentView.layoutMarginsGuide.rightAnchor),
             doneItemsControl.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            doneItemsControl.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
-        ])
+            doneItemsControl.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            
+            doneItemsCountLabel.rightAnchor.constraint(equalTo: showDoneItemsButton.leftAnchor),
+            doneItemsCountLabel.leftAnchor.constraint(equalTo: doneItemsControl.leftAnchor),
+            showDoneItemsButton.rightAnchor.constraint(equalTo: doneItemsControl.rightAnchor)
+        )
     }
 }

@@ -17,6 +17,7 @@
 		FA251728288F59480036D100 /* ToDoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA251727288F59480036D100 /* ToDoItem.swift */; };
 		FA25172A28905C930036D100 /* FileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA25172928905C930036D100 /* FileCache.swift */; };
 		FA25172D2891D8CA0036D100 /* ToDoItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA25172C2891D8CA0036D100 /* ToDoItemView.swift */; };
+		FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */; };
 		FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */; };
 		FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F928959FC10099B1A8 /* SceneDelegate.swift */; };
 		FA755F332895A29D00327D32 /* ToDoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F322895A29D00327D32 /* ToDoListView.swift */; };
@@ -65,6 +66,7 @@
 		FA251727288F59480036D100 /* ToDoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItem.swift; sourceTree = "<group>"; };
 		FA25172928905C930036D100 /* FileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCache.swift; sourceTree = "<group>"; };
 		FA25172C2891D8CA0036D100 /* ToDoItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemView.swift; sourceTree = "<group>"; };
+		FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Extensions.swift"; sourceTree = "<group>"; };
 		FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemViewController.swift; sourceTree = "<group>"; };
 		FA3792F928959FC10099B1A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		FA755F322895A29D00327D32 /* ToDoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListView.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				FA755F352895A70D00327D32 /* UIView+Extensions.swift */,
 				FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */,
 				FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */,
+				FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -383,6 +386,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */,
+				FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */,
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
