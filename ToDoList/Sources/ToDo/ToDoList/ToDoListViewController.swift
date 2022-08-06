@@ -10,52 +10,48 @@ import UIKit
 protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
     var notDoneItems: [ToDoItem] { get }
-    
-    
-    func addEmptyItem()
-    //    func showAddItem()
 }
 
-class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, UITableViewDelegate, UITableViewDataSource {
+class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
     
-    struct Constants {
-        static let reuseId: String = "Cell"
+    // MARK: init
+    init(model: ToDoListModel) {
+        self.model = model
+        super.init(nibName: nil, bundle: nil)
+        
+        model.delegate = self
     }
     
-    private let filename = "toDoItems"
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
+    // MARK: Private vars
     private var rootView: ToDoListView {
         guard let view = view as? ToDoListView else {
             fatalError("view \(String(describing: view)) not initialised")
         }
         return view
     }
-    
-    private lazy var fileCache: FileCache = {
-        let fileCache = FileCache()
-        try? fileCache.load(from: filename)
-        fileCache.delegate = self
-        return fileCache
-    }()
-    
     private lazy var toDoListView = ToDoListView(module: self)
-
-    @objc func toggleShowOnlyDone() {
-        showOnlyNotDone.toggle()
-//        print("someting")
-//        guard let header = rootView.dequeueReusableHeaderFooterView(withIdentifier: Header.Constants.reuseIdentifier) as? Header else {
-//            fatalError("str")
-//        }
-//        header.doneItemsCountLabel.text = "Выполнен"
+    
+    private let model: ToDoListModel
+    
+    private var showOnlyNotDone = true {
+        didSet {
+            let firstAndOnlySectionIndex = 0
+            rootView.reloadSections(IndexSet.init(integer: firstAndOnlySectionIndex), with: .automatic)
+        }
     }
     
-    override func loadView() {
-        super.loadView()
-        view = toDoListView
-        view.backgroundColor = AppConstants.Colors.backPrimary
+    private var displayedItems: [ToDoItem] {
+        (showOnlyNotDone ? notDoneItems : model.items.orderedByDate())
     }
     
-    lazy var addNewItemButton: UIButton = {
+    private var swipedRow: IndexPath?
+    
+    //MARK: Views
+    private lazy var addNewItemButton: UIButton = {
         let button = UIButton()
         let largeConfig = UIImage.SymbolConfiguration(pointSize: 44, weight: .bold, scale: .large)
         let buttonImage = UIImage(systemName: "plus.circle.fill", withConfiguration: largeConfig)
@@ -64,68 +60,23 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         return button
     }()
     
+    // MARK: - UIViewController
+    override func loadView() {
+        super.loadView()
+        view = toDoListView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpAddNewItemButton()
         
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
-    }
-    
-    private func setUpAddNewItemButton() {
-        view.addSubview(addNewItemButton)
-        addNewItemButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            addNewItemButton.widthAnchor.constraint(equalToConstant: 44),
-            addNewItemButton.heightAnchor.constraint(equalToConstant: 44),
-            addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-    }
-    
-    //    private func setUp() {
-    ////        view.backgroundColor = .white
-    //        view.addSubview(tableView)
-    //        tableView.backgroundColor = .white
-    //
-    //        tableView.register(Cell.self, forCellReuseIdentifier: Constants.reuseId)
-    //        tableView.delegate = self
-    //        tableView.dataSource = self
-    ////        tableView.rowHeight = UITableView.automaticDimension
-    ////        tableView.estimatedRowHeight =  600
-    //
-    //        tableView.reloadData()
-    //    }
-    
-    //    override func viewDidLayoutSubviews() {
-    //        super.viewDidLayoutSubviews()
-    //        tableView.frame = view.bounds
-    //
-    //    }
-    
-    
-    
-    // MARK: - ToDoItemModule
-    
-    func addItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        fileCache.add(item)
-        try? fileCache.save(to: filename)
-    }
-    
-    func deleteItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        try? fileCache.save(to: filename)
+        rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
     }
     
     // MARK: - ToDoListModule
     var doneItemsCount: Int {
-        fileCache.toDoItems
+        model.items
             .filter {
                 $0.done
             }
@@ -133,36 +84,39 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     }
     
     var notDoneItems: [ToDoItem] {
-        fileCache.toDoItems
+        model.items
             .filter {
                 !$0.done
             }
             .orderedByDate()
     }
     
-    private var showOnlyNotDone = true {
-        didSet {
-            rootView.reloadSections(IndexSet.init(integer: 0), with: .automatic)
-        }
+    func addItem(_ item: ToDoItem?) throws {
+        try model.addItem(item)
     }
     
-    private var displayedItems: [ToDoItem] {
-        (showOnlyNotDone ? notDoneItems : fileCache.toDoItems.orderedByDate())
+    func deleteItem(_ item: ToDoItem?) throws {
+        try model.deleteItem(item)
     }
     
-    @objc func addEmptyItem() {
+    func didDeleteItem() {
+        updateViews()
+    }
+    
+    func didAddItem() {
+        updateViews()
+    }
+    
+    // MARK: Actions
+    @objc private func toggleShowOnlyDone() {
+        showOnlyNotDone.toggle()
+    }
+    
+    @objc private func addEmptyItem() {
         presentToDoItemView(with: nil)
     }
     
     // MARK: - UITableViewDelegate
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        UITableView.automaticDimension
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        200
-    }
-    
     func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
         if tableView.isLastRowAt(indexPath) {
             return false
@@ -181,10 +135,6 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         presentToDoItemView(with: item)
     }
     
-    //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    //        "fuck"
-    //    }
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: Header.Constants.reuseIdentifier)
         guard let header = view as? Header else {
@@ -196,9 +146,6 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         header.showDoneItemsButton.addTarget(self, action: #selector(toggleShowOnlyDone), for: .touchUpInside)
         return header
     }
-    
-    
-    private var swipedRow: IndexPath?
     
     func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
         swipedRow = indexPath
@@ -214,19 +161,18 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.reuseId, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.Constants.reuseId, for: indexPath)
         
         guard let cell = cell as? Cell else {
-//            guard let _ = cell as? LastCell else {
-//                return cell
-//            }
-//
-//            return LastCell()
             return cell
         }
         
         if tableView.isLastRowAt(indexPath) {
-            return LastCell()
+            let lastCell = tableView.dequeueReusableCell(withIdentifier: LastCell.Constants.reuseIdentifier, for: indexPath)
+            guard let lastCell = lastCell as? LastCell else {
+                return lastCell
+            }
+            return lastCell
         }
         
         let item = displayedItems[indexPath.row]
@@ -258,17 +204,6 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         let config = UISwipeActionsConfiguration(actions: [doneAction])
         config.performsFirstActionWithFullSwipe = false
         return config
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if tableView.isLastRowAt(indexPath) {
-            return
-        }
-        
-        if editingStyle == .delete {
-            fileCache.remove(displayedItems[indexPath.row])
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        }
     }
     
     //MARK: - SwipeActions
@@ -306,52 +241,34 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         return action
     }()
     
-    func deleteSwipedItem() {
+    private func deleteSwipedItem() {
         print("deleted")
         guard let swipedRow = swipedRow else {
             return
         }
         let item = displayedItems[swipedRow.row]
-        deleteItem(item)
+        // TODO: handle error
+        try? deleteItem(item)
     }
     
-    func infoSwiped() {
+    private func infoSwiped() {
         print("do nothing")
     }
     
-    func moveSwipedItemToDone(in view: UIView) {
+    private func moveSwipedItemToDone(in view: UIView) {
         print("done")
         guard let swipedRow = swipedRow else {
             return
         }
         
-//        cell.setDone(with: true)
         let item = displayedItems[swipedRow.row]
         let newItem = ToDoItem(id: item.id, text: item.text, priority: item.priority, createdAt: item.createdAt, deadline: item.deadline, done: true, modifiedAt: item.modifiedAt)
-        addItem(newItem)
-        
-//        rootView.reloadData()
-    }
-    
-    // MARK: - ModelObserver
-    func didAddItem() {
-//                updateViews()
-    }
-    func didRemoveItem() {
-//                updateViews()
-    }
-    func didSave() {
-        updateViews()
-    }
-    func didLoad() {
-        updateViews()
+        // TODO: handle error
+        try? addItem(newItem)
     }
     
     // MARK: - Private funcs
     private func updateViews() {
-        //        view.setNeedsDisplay()
-        //        view.setNeedsLayout()
-        //        view.layoutIfNeeded()
         rootView.reloadData()
     }
     
@@ -368,11 +285,18 @@ class ToDoListViewController: UIViewController, ToDoListModule, ModelObserver, U
         
         toDoItem.modalPresentationStyle = .automatic
         navigationController?.present(navController, animated: true)
-        
-//        let toDoItem = ToDoItemViewController(fileCache: fileCache)
-//        let navController = UINavigationController(rootViewController: toDoItem)
-//        toDoItem.modalPresentationStyle = .automatic
-//        navigationController?.present(navController, animated: true)
+    }
+    
+    private func setUpAddNewItemButton() {
+        view.addSubview(addNewItemButton)
+        addNewItemButton.translatesAutoresizingMaskIntoConstraints = false
+        let newItemButtonSize: CGFloat = 44
+        NSLayoutConstraint.activate([
+            addNewItemButton.widthAnchor.constraint(equalToConstant: newItemButtonSize),
+            addNewItemButton.heightAnchor.constraint(equalToConstant: newItemButtonSize),
+            addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
 }
 

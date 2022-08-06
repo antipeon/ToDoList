@@ -8,8 +8,9 @@
 import UIKit
 
 class Cell: UITableViewCell {
-    private struct Constants {
+    enum Constants {
         static let gap: CGFloat = 16
+        static let reuseId: String = "cellId"
     }
     
     private lazy var text: UILabel = {

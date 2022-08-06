@@ -27,6 +27,7 @@
 		FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */; };
 		FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */; };
 		FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED3289DD449008A6690 /* LastCell.swift */; };
+		FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED5289E987A008A6690 /* ToDoListModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListHeaderView.swift; sourceTree = "<group>"; };
 		FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListCellView.swift; sourceTree = "<group>"; };
 		FAB72ED3289DD449008A6690 /* LastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastCell.swift; sourceTree = "<group>"; };
+		FAB72ED5289E987A008A6690 /* ToDoListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +152,7 @@
 			children = (
 				FA251727288F59480036D100 /* ToDoItem.swift */,
 				FA25172928905C930036D100 /* FileCache.swift */,
+				FAB72ED5289E987A008A6690 /* ToDoListModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -366,6 +369,7 @@
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
+				FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
 				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
 				FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */,

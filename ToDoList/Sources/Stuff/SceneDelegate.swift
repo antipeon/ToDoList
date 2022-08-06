@@ -21,14 +21,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         
         let navigationViewController = UINavigationController()
-        let toDoListViewController = ToDoListViewController()
+        
+        // TODO: handle errors
+        guard let model = try? ToDoListModel() else {
+            fatalError("model can't be initialized")
+        }
+        
+        let toDoListViewController = ToDoListViewController(model: model)
         toDoListViewController.title = "Мои дела"
         navigationViewController.viewControllers = [toDoListViewController]
         toDoListViewController.navigationController?.navigationBar.prefersLargeTitles = true
         window.rootViewController = navigationViewController
         
         let style = NSMutableParagraphStyle()
-        style.firstLineHeadIndent = 32
+        
+        let navigationBarTitleIndent: CGFloat = 32
+        style.firstLineHeadIndent = navigationBarTitleIndent
         UINavigationBar.appearance().largeTitleTextAttributes = [
             NSAttributedString.Key.paragraphStyle: style
         ]

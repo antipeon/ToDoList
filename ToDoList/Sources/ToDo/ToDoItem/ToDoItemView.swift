@@ -9,7 +9,7 @@ import UIKit
 
 final class ToDoItemView: UIView  {
     
-    typealias Module = ToDoItemModule
+    typealias Module = ToDoItemModule & UITextViewDelegate
     
     // MARK: - Views
     private lazy var vStackView: UIStackView = {
@@ -169,7 +169,7 @@ final class ToDoItemView: UIView  {
     
     // MARK: - Properties
     
-    private weak var module: Module?
+    private var module: Module
     private var item: ToDoItem?
     
     // MARK: - Init
@@ -181,24 +181,20 @@ final class ToDoItemView: UIView  {
         setUp()
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setUp()
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Public Methods
     func cancel() {
-        module?.dismiss()
+        module.dismiss()
     }
     
-    func save() {
+    func save() throws {
         updateModel()
-        module?.addItem(item)
-        module?.dismiss()
+        // TODO: handle errors
+        try module.addItem(item)
+        module.dismiss()
     }
     
     func setUpTextViewPlaceholder(_ textView: UITextView) {
@@ -208,7 +204,7 @@ final class ToDoItemView: UIView  {
     
     func updateViewsDisplay() {
         deleteButton.isEnabled = enoughInfoFilled
-        module?.navigationItem.rightBarButtonItem?.isEnabled = enoughInfoFilled
+        module.navigationItem.rightBarButtonItem?.isEnabled = enoughInfoFilled
         calendarButton.isHidden = !dateSelected
         if !dateSelected {
             calendar.isHidden = true
@@ -303,10 +299,6 @@ final class ToDoItemView: UIView  {
         dividerView2.isHidden = calendar.isHidden
     }
     
-    private func toggleCalendarSwitch() {
-        calendar.isHidden.toggle()
-    }
-    
     private func showCalendar() {
         calendar.isHidden = false
         dividerView2.isHidden = false
@@ -375,10 +367,11 @@ final class ToDoItemView: UIView  {
     }
     
     // MARK: - Actions
-    @objc private func deleteItem() {
+    @objc private func deleteItem() throws {
         updateModel()
-        module?.deleteItem(item)
-        module?.dismiss()
+        // TODO: handle errors
+        try module.deleteItem(item)
+        module.dismiss()
     }
     
     @objc private func datePickerDateChanged() {
@@ -397,7 +390,6 @@ final class ToDoItemView: UIView  {
     
     @objc private func toggleCalendarState() {
         toggleCalendar()
-//        toggleCalendarSwitch()
         deadline = initialDeadline
         updateSelectedDate()
         updateViewsDisplay()

@@ -17,12 +17,14 @@ extension DismissableModule {
     }
 }
 
-protocol ToDoItemModule: DismissableModule, UITextViewDelegate {
-    func addItem(_ item: ToDoItem?)
-    func deleteItem(_ item: ToDoItem?)
+protocol ToDoItemModule: DismissableModule {
+    func addItem(_ item: ToDoItem?) throws
+    func deleteItem(_ item: ToDoItem?) throws
 }
 
-class ToDoItemViewController: UIViewController, ToDoItemModule {
+
+
+class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
     
     // MARK: - Views
     private lazy var toDoItemView = ToDoItemView(module: self, item: item)
@@ -103,8 +105,8 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
         rootView.setNeedsDisplay()
     }
     
-    @objc private func save() {
-        rootView.save()
+    @objc private func save() throws {
+        try rootView.save()
     }
     
     @objc private func cancel() {
@@ -129,12 +131,12 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
    }
     
     // MARK: - ToDoItemModule
-    func addItem(_ item: ToDoItem?) {
-        module.addItem(item)
+    func addItem(_ item: ToDoItem?) throws {
+        try module.addItem(item)
     }
     
-    func deleteItem(_ item: ToDoItem?) {
-        module.deleteItem(item)
+    func deleteItem(_ item: ToDoItem?) throws {
+        try module.deleteItem(item)
     }
 }
 

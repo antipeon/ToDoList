@@ -10,16 +10,10 @@ import Foundation
 class FileCache {
     private(set) var toDoItems = [ToDoItem]()
     
-    var delegate: ModelObserver?
-    
     /// Adds item to collection if not present
     /// - Parameter item: Item to add
     /// - Returns: true if successfully added; false otherwise
     @discardableResult func add(_ item: ToDoItem) -> Bool {
-        defer {
-            delegate?.didAddItem()
-        }
-        
         if toDoItems.index(matching: item) != nil {
             return false
         }
@@ -31,10 +25,6 @@ class FileCache {
     /// - Parameter item: Item to remove
     /// - Returns: Removed item; nil otherwise
     @discardableResult func remove(_ item: ToDoItem) -> ToDoItem? {
-        defer {
-            delegate?.didRemoveItem()
-        }
-        
         guard let index = toDoItems.index(matching: item) else {
             return nil
         }
@@ -44,10 +34,6 @@ class FileCache {
     /// Saves collection to file
     /// - Parameter fileName: name of file to save to
     func save(to fileName: String) throws {
-        defer {
-            delegate?.didSave()
-        }
-        
         let toDoItemsJsons = toDoItems.map {
             $0.json
         }
@@ -63,10 +49,6 @@ class FileCache {
     /// Loads collection from file
     /// - Parameter fileName: name of file to load from
     func load(from fileName: String) throws {
-        defer {
-            delegate?.didLoad()
-        }
-        
         let fileUrl = fileInDocumentDir(with: fileName)
         
         let jsonData = try Data(contentsOf: fileUrl)
@@ -120,11 +102,4 @@ extension FileCache.FileCacheError {
             return "can't decode json"
         }
     }
-}
-
-protocol ModelObserver {
-    func didAddItem()
-    func didRemoveItem()
-    func didSave()
-    func didLoad()
 }

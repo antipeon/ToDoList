@@ -8,6 +8,16 @@
 import Foundation
 
 struct ToDoItem: Identifiable {
+    private enum Constants {
+        static let idKey = "id"
+        static let textKey = "text"
+        static let priorityKey = "priority"
+        static let createdAtKey = "createdAt"
+        static let deadlineKey = "deadline"
+        static let doneKey = "done"
+        static let modifiedAtKey = "modifiedAt"
+    }
+    
     let id: String
     let text: String
     let priority: Priority
@@ -51,7 +61,7 @@ extension ToDoItem: Equatable {
 extension ToDoItem {
     init?(from dictionary: [String: Any]) {
         // check if only allowed keys
-        let allowedKeys = ["id", "text", "done", "createdAt", "priority", "deadline", "modifiedAt"]
+        let allowedKeys = [Constants.idKey, Constants.textKey, Constants.doneKey, Constants.createdAtKey, Constants.priorityKey, Constants.deadlineKey, Constants.modifiedAtKey]
         let notAllowedKeys = dictionary.keys
             .filter {
                 !allowedKeys.contains($0)
@@ -60,16 +70,16 @@ extension ToDoItem {
             return nil
         }
         // these keys have to be there
-        guard let id = dictionary["id"] as? String,
-              let text = dictionary["text"] as? String,
-              let done = dictionary["done"] as? Bool,
-              let createdAt = (dictionary["createdAt"] as? Int)?.date else {
+        guard let id = dictionary[Constants.idKey] as? String,
+              let text = dictionary[Constants.textKey] as? String,
+              let done = dictionary[Constants.doneKey] as? Bool,
+              let createdAt = (dictionary[Constants.createdAtKey] as? Int)?.date else {
             return nil
         }
         
         // set priority
         var priority = Priority.normal
-        if let priorityInDictionaryStr = dictionary["priority"] as? String {
+        if let priorityInDictionaryStr = dictionary[Constants.priorityKey] as? String {
             guard let priorityInDictionary = Priority(rawValue: priorityInDictionaryStr) else {
                 return nil
             }
@@ -80,8 +90,8 @@ extension ToDoItem {
         }
         
         // set optional properties
-        let deadline = (dictionary["deadline"] as? Int)?.date
-        let modifiedAt = (dictionary["modifiedAt"] as? Int)?.date
+        let deadline = (dictionary[Constants.deadlineKey] as? Int)?.date
+        let modifiedAt = (dictionary[Constants.modifiedAtKey] as? Int)?.date
         
         self.init(id: id, text: text, priority: priority, createdAt: createdAt, deadline: deadline, done: done, modifiedAt: modifiedAt)
     }
@@ -102,25 +112,25 @@ extension ToDoItem {
     /// - Returns: json as [String: Any]
     var json: Any {
         var dictionary: [String: Any] = [
-            "id" : id,
-            "text" : text,
-            "done" : done,
-            "createdAt" : createdAt.timeStamp,
+            Constants.idKey : id,
+            Constants.textKey : text,
+            Constants.doneKey : done,
+            Constants.createdAtKey : createdAt.timeStamp,
         ]
         
         switch priority {
         case .normal:
             break
         default:
-            dictionary["priority"] = priority.rawValue
+            dictionary[Constants.priorityKey] = priority.rawValue
         }
         
         if let deadline = deadline {
-            dictionary["deadline"] = deadline.timeStamp
+            dictionary[Constants.deadlineKey] = deadline.timeStamp
         }
         
         if let modifiedAt = modifiedAt {
-            dictionary["modifiedAt"] = modifiedAt.timeStamp
+            dictionary[Constants.modifiedAtKey] = modifiedAt.timeStamp
         }
         return dictionary
     }
