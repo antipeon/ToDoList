@@ -33,7 +33,6 @@ class LastCell: UITableViewCell {
         view.addSubview(footer)
         return view
     }()
-
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

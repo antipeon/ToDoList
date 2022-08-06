@@ -11,11 +11,14 @@ class Cell: UITableViewCell {
     enum Constants {
         static let gap: CGFloat = 16
         static let reuseId: String = "cellId"
+        static let maxNumberOfLinesInTextView = 3
+        static let cellHorizontalSpacing: CGFloat = 5
+        static let doneIconSize: CGFloat = 24
     }
     
     private lazy var text: UILabel = {
         let view = UILabel()
-        view.numberOfLines = 3
+        view.numberOfLines = Constants.maxNumberOfLinesInTextView
         view.translatesAutoresizingMaskIntoConstraints = false
         view.font = AppConstants.Fonts.body
         return view
@@ -101,7 +104,7 @@ class Cell: UITableViewCell {
     private lazy var cellContent: UIStackView = {
         let view = UIStackView.makeHStackView()
         view.alignment = .center
-        view.spacing = 5
+        view.spacing = Constants.cellHorizontalSpacing
         return view
     }()
     
@@ -138,14 +141,8 @@ class Cell: UITableViewCell {
                 containerView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
                 containerView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
                 
-                doneIcon.widthAnchor.constraint(equalToConstant: 24),
-                doneIcon.heightAnchor.constraint(equalToConstant: 24),
-//
-//                text.leftAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.leftAnchor),
-//                text.rightAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.rightAnchor
-//                                           ),
-//                text.topAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.topAnchor),
-//                text.bottomAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.bottomAnchor)
+                doneIcon.widthAnchor.constraint(equalToConstant: Constants.doneIconSize),
+                doneIcon.heightAnchor.constraint(equalToConstant: Constants.doneIconSize),
                 
                 cellContent.leftAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.leftAnchor),
                 cellContent.rightAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.rightAnchor
@@ -177,8 +174,6 @@ class Cell: UITableViewCell {
         
         let attrString = NSMutableAttributedString(string: item.text)
         attrString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 2, range: NSRange(location: 0, length: attrString.length))
-        
-//        attrString.addAttribute(NSAttributedString.Key.co, value: <#T##Any#>, range: NSRange)
         text.textColor = AppConstants.Colors.labelTertiary
         
         text.attributedText = attrString
@@ -228,25 +223,4 @@ class Cell: UITableViewCell {
         doneIcon.image = UIImage(systemName: "circle")
         doneIcon.tintColor = AppConstants.Colors.separatorColor
     }
-    
-    
-    
-    
-    //    override func layoutSubviews() {
-    //        super.layoutSubviews()
-    //        containerView.bounds = contentView.bounds
-    //    }
-    
-    //    override func layoutSubviews() {
-    //        super.layoutSubviews()
-    //        text.frame.origin = .init(x: 0, y: 0)
-    //        text.sizeToFit()
-    //        let containerWidth = contentView.bounds.width - 2 * Constants.gap
-    ////        text.frame.size = .init(width: containerWidth, height: 20)
-    //
-    //
-    //        let contentHeight = text.bounds.height
-    //        containerView.frame = .init(x: Constants.gap, y: (contentView.bounds.height - contentHeight) / 2, width: containerWidth, height: contentHeight)
-    //    }
-    
 }

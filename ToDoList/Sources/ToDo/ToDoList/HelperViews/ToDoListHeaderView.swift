@@ -45,8 +45,6 @@ class Header: UITableViewHeaderFooterView {
         return button
     }()
     
-    
-    
     func setUpViews() {
         showDoneItemsButton.translatesAutoresizingMaskIntoConstraints = false
         doneItemsCountLabel.translatesAutoresizingMaskIntoConstraints = false

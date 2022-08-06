@@ -28,6 +28,9 @@
 		FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */; };
 		FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED3289DD449008A6690 /* LastCell.swift */; };
 		FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED5289E987A008A6690 /* ToDoListModel.swift */; };
+		FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED8289ECA77008A6690 /* PriorityView.swift */; };
+		FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDA289ED726008A6690 /* DeadlineView.swift */; };
+		FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +76,9 @@
 		FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListCellView.swift; sourceTree = "<group>"; };
 		FAB72ED3289DD449008A6690 /* LastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastCell.swift; sourceTree = "<group>"; };
 		FAB72ED5289E987A008A6690 /* ToDoListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListModel.swift; sourceTree = "<group>"; };
+		FAB72ED8289ECA77008A6690 /* PriorityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityView.swift; sourceTree = "<group>"; };
+		FAB72EDA289ED726008A6690 /* DeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeadlineView.swift; sourceTree = "<group>"; };
+		FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchSectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +177,7 @@
 		FA3792F028958E390099B1A8 /* ToDoItem */ = {
 			isa = PBXGroup;
 			children = (
+				FAB72ED7289EC9A2008A6690 /* ToDoItemHelperViews */,
 				FA25172C2891D8CA0036D100 /* ToDoItemView.swift */,
 				FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */,
 			);
@@ -233,6 +240,16 @@
 				FAB72ED3289DD449008A6690 /* LastCell.swift */,
 			);
 			path = HelperViews;
+			sourceTree = "<group>";
+		};
+		FAB72ED7289EC9A2008A6690 /* ToDoItemHelperViews */ = {
+			isa = PBXGroup;
+			children = (
+				FAB72ED8289ECA77008A6690 /* PriorityView.swift */,
+				FAB72EDA289ED726008A6690 /* DeadlineView.swift */,
+				FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */,
+			);
+			path = ToDoItemHelperViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -365,10 +382,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */,
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
+				FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */,
 				FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
 				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
@@ -379,6 +398,7 @@
 				FA25172D2891D8CA0036D100 /* ToDoItemView.swift in Sources */,
 				FA2516F7288F56420036D100 /* AppDelegate.swift in Sources */,
 				FA251728288F59480036D100 /* ToDoItem.swift in Sources */,
+				FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */,
 				FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */,
 				FA25172A28905C930036D100 /* FileCache.swift in Sources */,
 			);

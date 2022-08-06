@@ -64,88 +64,11 @@ final class ToDoItemView: UIView  {
         
         return datePicker
     }()
-    
-    private lazy var calendarSwitch: UISwitch = {
-        let switchButton = UISwitch()
-        switchButton.isOn = (item?.deadline == nil ? false : true)
-        switchButton.addTarget(self, action: #selector(toggleCalendarState), for: .touchUpInside)
-        switchButton.translatesAutoresizingMaskIntoConstraints = false
-        switchButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        return switchButton
-        
-    }()
-    
-    private lazy var doBeforeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Сделать до"
-        label.font = AppConstants.Fonts.body
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private lazy var dividerView1: UIView = {
-        getDivider()
-    }()
-    
+ 
     private lazy var dividerView2: UIView = {
-        let divider = getDivider()
+        let divider = ToDoItemView.getDivider()
         divider.isHidden = true
         return divider
-    }()
-    
-    private lazy var calendarButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle(dateStr, for: .normal)
-        button.titleLabel?.font = AppConstants.Fonts.footnote
-        button.contentHorizontalAlignment = .left
-        button.backgroundColor = AppConstants.Colors.secondary
-        button.addTarget(self, action: #selector(switchCalendarState), for: .touchUpInside)
-        button.layer.cornerRadius = Constants.cornerRadius
-        
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        return button
-        
-    }()
-    
-    private lazy var doBeforeLabelAndCalendarButton: UIStackView = {
-        UIStackView.makeVStackView()
-    }()
-    
-    private lazy var priorityLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Важность"
-        label.font = AppConstants.Fonts.body
-        label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        return label
-    }()
-    
-    private lazy var prioritySwitch: UISegmentedControl = {
-        let view = UISegmentedControl()
-        view.insertSegment(with: UIImage(systemName: "arrow.down"), at: 0, animated: false)
-        view.insertSegment(withTitle: "нет", at: 1, animated: false)
-        let exclamationMark = UIImage(systemName: "exclamationmark.2")?.withTintColor(.red, renderingMode: .alwaysOriginal)
-        view.insertSegment(with: exclamationMark, at: 2, animated: false)
-        view.selectedSegmentIndex = 1
-        
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private lazy var prioritySwitchAndLabel: UIStackView = {
-        let view = UIStackView.makeHStackView()
-        view.alignment = .center
-        return view
-    }()
-    
-    private lazy var calendarButtonAndSwitch: UIStackView = {
-        let view = UIStackView.makeHStackView()
-        view.layer.cornerRadius = Constants.cornerRadius
-        view.alignment = .center
-        return view
     }()
     
     private lazy var lowerSectionVstackView: UIStackView = {
@@ -153,19 +76,13 @@ final class ToDoItemView: UIView  {
         view.backgroundColor = AppConstants.Colors.secondary
         view.layer.cornerRadius = Constants.cornerRadius
         view.distribution = .fill
-        view.spacing = Constants.defaultOffset
-        
-        view.isLayoutMarginsRelativeArrangement = true
         view.layoutMargins = defaultLayoutMargins
         
         return view
     }()
     
-    private lazy var switchSection: UIStackView = {
-        let view = UIStackView.makeVStackView()
-        view.spacing = Constants.defaultOffset
-        return view
-    }()
+    private lazy var switchSection = SwitchSectionView(frame: .zero)
+    
     
     // MARK: - Properties
     
@@ -205,7 +122,7 @@ final class ToDoItemView: UIView  {
     func updateViewsDisplay() {
         deleteButton.isEnabled = enoughInfoFilled
         module.navigationItem.rightBarButtonItem?.isEnabled = enoughInfoFilled
-        calendarButton.isHidden = !dateSelected
+        switchSection.deadlineView.calendarButton.isHidden = !dateSelected
         if !dateSelected {
             calendar.isHidden = true
         }
@@ -215,20 +132,20 @@ final class ToDoItemView: UIView  {
     private func setUp() {
         backgroundColor = AppConstants.Colors.backPrimary
         addViews()
+        setUpDeadlineView()
         setUpConstraints()
         loadModel()
         updateViewsDisplay()
     }
     
+    private func setUpDeadlineView() {
+        switchSection.deadlineView.calendarButton.setTitle(dateStr, for: .normal)
+        switchSection.deadlineView.calendarButton.addTarget(self, action: #selector(switchCalendarState), for: .touchUpInside)
+        switchSection.deadlineView.calendarSwitch.isOn = (item?.deadline == nil ? false : true)
+        switchSection.deadlineView.calendarSwitch.addTarget(self, action: #selector(toggleCalendarState), for: .touchUpInside)
+    }
+    
     private func addViews() {
-        
-        doBeforeLabelAndCalendarButton.addArrangedSubviews(doBeforeLabel, calendarButton)
-        
-        calendarButtonAndSwitch.addArrangedSubviews(doBeforeLabelAndCalendarButton, calendarSwitch)
-        
-        prioritySwitchAndLabel.addArrangedSubviews(priorityLabel, prioritySwitch)
-
-        switchSection.addArrangedSubviews(prioritySwitchAndLabel, dividerView1, calendarButtonAndSwitch)
         
         lowerSectionVstackView.addArrangedSubviews(
             switchSection,
@@ -249,9 +166,7 @@ final class ToDoItemView: UIView  {
         
         NSLayoutConstraint.activate([
             switchSection.heightAnchor.constraint(equalToConstant: Constants.switchSectionHeight),
-            prioritySwitchAndLabel.heightAnchor.constraint(equalTo: calendarButtonAndSwitch.heightAnchor),
-            prioritySwitch.heightAnchor.constraint(equalToConstant: Constants.prioritySwitchHeight),
-            priorityLabel.heightAnchor.constraint(equalToConstant: Constants.priorityLabelHeight),
+            
 
             toDoText.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textViewMinHeight),
             lowerSectionVstackView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.lowerSectionMaxHeight),
@@ -262,7 +177,7 @@ final class ToDoItemView: UIView  {
             vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.defaultOffset),
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),
 
-            dividerView1.heightAnchor.constraint(equalToConstant: Constants.dividerHeight),
+            
             dividerView2.heightAnchor.constraint(equalToConstant: Constants.dividerHeight)
         ])
     }
@@ -285,11 +200,11 @@ final class ToDoItemView: UIView  {
         if let item = item {
             switch item.priority {
             case .high:
-                prioritySwitch.selectedSegmentIndex = 2
+                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 2
             case .normal:
-                prioritySwitch.selectedSegmentIndex = 1
+                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 1
             case .low:
-                prioritySwitch.selectedSegmentIndex = 0
+                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 0
             }
         }
     }
@@ -323,9 +238,7 @@ final class ToDoItemView: UIView  {
                                                          bottom: Constants.defaultOffset,
                                                          right: Constants.defaultOffset)
     
-    
-    
-    private func getDivider() -> UIView {
+    static func getDivider() -> UIView {
         let view = UIView()
         view.backgroundColor = AppConstants.Colors.separatorColor
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -340,7 +253,7 @@ final class ToDoItemView: UIView  {
     
     private func updateSelectedDate() {
         calendar.date = deadline
-        calendarButton.setTitle(dateStr, for: .normal)
+        switchSection.deadlineView.calendarButton.setTitle(dateStr, for: .normal)
     }
     
     private lazy var initialDeadline: Date = {
@@ -363,7 +276,7 @@ final class ToDoItemView: UIView  {
     }()
     
     private var dateSelected: Bool {
-        calendarSwitch.isOn
+        switchSection.deadlineView.calendarSwitch.isOn
     }
     
     // MARK: - Actions
@@ -376,7 +289,7 @@ final class ToDoItemView: UIView  {
     
     @objc private func datePickerDateChanged() {
         deadline = calendar.date
-        calendarButton.setTitle(dateStr, for: .normal)
+        switchSection.deadlineView.calendarButton.setTitle(dateStr, for: .normal)
         hideCalendar()
         updateViewsDisplay()
         setNeedsDisplay()
@@ -397,11 +310,11 @@ final class ToDoItemView: UIView  {
     }
     
     private func updateModel() {
-        guard let priority = ToDoItem.Priority.makePriorityFromSelectedSegmentIndex(prioritySwitch.selectedSegmentIndex) else {
+        guard let priority = ToDoItem.Priority.makePriorityFromSelectedSegmentIndex(switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex) else {
             fatalError("no such priority")
         }
         
-        let deadline = calendarSwitch.isOn ? deadline : nil
+        let deadline = switchSection.deadlineView.calendarSwitch.isOn ? deadline : nil
         
         let now = Date.now
         
@@ -414,9 +327,10 @@ final class ToDoItemView: UIView  {
     }
     
     // MARK: - Constants
-    private struct Constants {
+    enum Constants {
         
         static let defaultOffset: CGFloat = 16
+        static let switchSectionTopInset: CGFloat = 10
         static let cornerRadius: CGFloat = 20
         static let textViewMinHeight: CGFloat = 120
         static let textViewMaxHeight: CGFloat = 484
@@ -425,8 +339,6 @@ final class ToDoItemView: UIView  {
         static let deleteButttonHeight: CGFloat = 56
         static let dividerHeight: CGFloat = 0.5
         static let switchSectionHeight: CGFloat = 112.5
-        static let prioritySwitchHeight: CGFloat = 36
-        static let priorityLabelHeight: CGFloat = 22
         
         static let textViewPlaceholder = "Что надо сделать?"
     }
