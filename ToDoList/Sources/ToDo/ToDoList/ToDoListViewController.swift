@@ -201,6 +201,10 @@ class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDel
         if tableView.isLastRowAt(indexPath) {
             return nil
         }
+        let item = displayedItems[indexPath.row]
+        if item.done {
+            return nil
+        }
         let config = UISwipeActionsConfiguration(actions: [doneAction])
         config.performsFirstActionWithFullSwipe = false
         return config
