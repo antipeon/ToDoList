@@ -110,7 +110,7 @@ class Cell: UITableViewCell {
     
     // MARK: - Modify Views func
     func setUpCell(with item: ToDoItem) {
-        setDone(with: item.done)
+        setDone(with: item)
         setToDoText(with: item)
         setDeadline(with: item.deadline)
         setPriority(with: item.priority)
@@ -151,13 +151,15 @@ class Cell: UITableViewCell {
         }
     }
     
-    private func setDone(with done: Bool) {
-        if done {
+    private func setDone(with item: ToDoItem) {
+        if item.done {
             setIconToDone()
+            return
+        } else if let deadline = item.deadline, deadline < .now {
+            setIconToDeadlineMiss()
             return
         }
         setIconToNotDone()
-        setNeedsDisplay()
     }
     
     // MARK: Private funcs
@@ -169,6 +171,11 @@ class Cell: UITableViewCell {
     private func setIconToNotDone() {
         doneIcon.image = UIImage(systemName: "circle")
         doneIcon.tintColor = AppConstants.Colors.separatorColor
+    }
+    
+    private func setIconToDeadlineMiss() {
+        doneIcon.image = UIImage(systemName: "circle")
+        doneIcon.tintColor = .red
     }
     
     private func dateStr(from deadline: Date) -> String {
