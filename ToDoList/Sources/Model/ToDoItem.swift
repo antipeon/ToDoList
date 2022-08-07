@@ -59,16 +59,15 @@ extension ToDoItem: Equatable {
 }
 
 extension ToDoItem {
-    init?(from dictionary: [String: Any]) {
-        // check if only allowed keys
-        let allowedKeys = [Constants.idKey, Constants.textKey, Constants.doneKey, Constants.createdAtKey, Constants.priorityKey, Constants.deadlineKey, Constants.modifiedAtKey]
-        let notAllowedKeys = dictionary.keys
-            .filter {
-                !allowedKeys.contains($0)
-            }
-        guard notAllowedKeys.isEmpty else {
+    /// Parses json to toDoItem
+    /// - Parameter json: [String: Any]
+    /// - Returns: ToDoItem if can convert
+    static func parse(json: Any) -> ToDoItem? {
+        
+        guard let dictionary = json as? [String: Any] else {
             return nil
         }
+        
         // these keys have to be there
         guard let id = dictionary[Constants.idKey] as? String,
               let text = dictionary[Constants.textKey] as? String,
@@ -79,13 +78,8 @@ extension ToDoItem {
         
         // set priority
         var priority = Priority.normal
-        if let priorityInDictionaryStr = dictionary[Constants.priorityKey] as? String {
-            guard let priorityInDictionary = Priority(rawValue: priorityInDictionaryStr) else {
-                return nil
-            }
-            if priorityInDictionary == .normal {
-                return nil
-            }
+        if let priorityInDictionaryStr = dictionary[Constants.priorityKey] as? String,
+           let priorityInDictionary = Priority(rawValue: priorityInDictionaryStr) {
             priority = priorityInDictionary
         }
         
@@ -93,19 +87,7 @@ extension ToDoItem {
         let deadline = (dictionary[Constants.deadlineKey] as? Int)?.date
         let modifiedAt = (dictionary[Constants.modifiedAtKey] as? Int)?.date
         
-        self.init(id: id, text: text, priority: priority, createdAt: createdAt, deadline: deadline, done: done, modifiedAt: modifiedAt)
-    }
-    
-    /// Parses json to toDoItem
-    /// - Parameter json: [String: Any]
-    /// - Returns: ToDoItem if can convert
-    static func parse(json: Any) -> ToDoItem? {
-
-        guard let dictionary = json as? [String: Any] else {
-            return nil
-        }
-        
-        return ToDoItem(from: dictionary)
+        return ToDoItem(id: id, text: text, priority: priority, createdAt: createdAt, deadline: deadline, done: done, modifiedAt: modifiedAt)
     }
     
     /// Produces json from self

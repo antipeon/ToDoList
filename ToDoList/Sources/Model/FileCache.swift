@@ -87,12 +87,6 @@ class FileCache {
     }
 }
 
-extension FileCache: Equatable {
-    static func == (lhs: FileCache, rhs: FileCache) -> Bool {
-        lhs.toDoItems == rhs.toDoItems
-    }
-}
-
 extension FileCache.FileCacheError {
     public var description: String {
         switch self {
