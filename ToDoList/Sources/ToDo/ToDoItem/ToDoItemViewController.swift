@@ -116,10 +116,21 @@ class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelega
     // MARK: - Landscape/Portrait Mode
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        if UIDevice.current.orientation.isLandscape {
+        prepareViewsAccordingToOrientation()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        prepareViewsAccordingToOrientation()
+    }
+    
+    private func prepareViewsAccordingToOrientation() {
+        if traitCollection.verticalSizeClass == .compact {
+            // landscape
             rootView.lowerSectionVstackView.isHidden = true
             rootView.deleteButton.isHidden = true
         } else {
+            // normal
             rootView.lowerSectionVstackView.isHidden = false
             rootView.deleteButton.isHidden = false
         }
