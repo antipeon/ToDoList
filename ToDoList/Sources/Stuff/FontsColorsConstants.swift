@@ -19,7 +19,7 @@ struct AppConstants {
         static let lightGray = UIColor(red: 0.82, green: 0.82, blue: 0.84, alpha: 1.0)
         static let lightGreen = UIColor(red: 52, green: 199, blue: 89, alpha: 91)
     }
-    
+
     struct Fonts {
         static let body: UIFont = .systemFont(ofSize: 22)
         static let subhead: UIFont = .systemFont(ofSize: 20)

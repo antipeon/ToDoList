@@ -9,7 +9,7 @@ import XCTest
 @testable import ToDoList
 
 class ToDoListTests: XCTestCase {
-    
+
     let firstItem = ToDoItem(text: "buy milk", priority: .low, createdAt: .now, done: false)
 
     let secondItem = ToDoItem(
@@ -31,39 +31,33 @@ class ToDoListTests: XCTestCase {
     }
 
     func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
     }
-    
-    
+
     // MARK: - ToDoItem tests
     func testParseToJsonThenInitFromJson_ObjectsAreEqual1() {
         let jsonForItem = firstItem.json
         let item = ToDoItem.parse(json: jsonForItem)
         XCTAssertTrue(ToDoItem.haveSameProperties(firstItem, item))
     }
-    
+
     func testParseToJsonThenInitFromJson_ObjectsAreEqual2() {
         let jsonForItem = secondItem.json
         let item = ToDoItem.parse(json: jsonForItem)
         XCTAssertTrue(ToDoItem.haveSameProperties(secondItem, item))
     }
-    
+
     // MARK: - FileCache tests
     func testAddItem() {
         let fileCache = FileCache()
         XCTAssertTrue(fileCache.add(firstItem))
         XCTAssertFalse(fileCache.add(firstItem))
         guard let toDoItemsFirst = fileCache.toDoItems.first else {
-            XCTFail()
+            XCTFail("no items in cache")
             return
         }
         XCTAssertTrue(ToDoItem.haveSameProperties(toDoItemsFirst, firstItem))
     }
-    
+
     func testRemoveItem() {
         let fileCache = FileCache()
         XCTAssertNil(fileCache.remove(firstItem))
@@ -71,20 +65,20 @@ class ToDoListTests: XCTestCase {
         XCTAssertNil(fileCache.remove(secondItem))
         XCTAssertTrue(ToDoItem.haveSameProperties(fileCache.remove(firstItem), firstItem))
     }
-    
+
     func testSaveToFileThenLoadFromFile_ObjectsAreEqual() throws {
         let fileCache = FileCache()
         fileCache.add(firstItem)
         fileCache.add(secondItem)
-        
+
         let fileName = "file"
         try fileCache.save(to: fileName)
-        
+
         XCTAssertEqual(fileCache.toDoItems.count, 2)
-        
+
         let fileCache1 = FileCache()
         try fileCache1.load(from: fileName)
-        
+
         XCTAssertTrue(FileCache.haveItemsWithSameProperties(fileCache, fileCache1))
     }
 
@@ -117,7 +111,7 @@ extension ToDoItem {
             }
             fatalError("can't reach here")
         }
-        
+
         return lhs.id == rhs.id && lhs.text == rhs.text &&
         lhs.priority == rhs.priority && lhs.createdAt == rhs.createdAt &&
         lhs.deadline == rhs.deadline && lhs.done == rhs.done && lhs.modifiedAt == rhs.modifiedAt
