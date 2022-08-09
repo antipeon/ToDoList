@@ -11,8 +11,16 @@ import XCTest
 class ToDoListTests: XCTestCase {
     
     let firstItem = ToDoItem(text: "buy milk", priority: .low, createdAt: .now, done: false)
-    
-    let secondItem = ToDoItem(id: "customId", text: "do homework", priority: .normal, createdAt: .now.incrementedBy(days: 1), deadline: .now.incrementedBy(days: 7), done: false, modifiedAt: .now.incrementedBy(days: 1))
+
+    let secondItem = ToDoItem(
+        id: "customId",
+        text: "do homework",
+        priority: .normal,
+        createdAt: .now.incrementedBy(days: 1),
+        deadline: .now.incrementedBy(days: 7),
+        done: false,
+        modifiedAt: .now.incrementedBy(days: 1)
+    )
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -121,8 +129,8 @@ extension FileCache {
         guard lhs.toDoItems.count == rhs.toDoItems.count else {
             return false
         }
-        for i in 0..<lhs.toDoItems.count {
-            if !ToDoItem.haveSameProperties(lhs.toDoItems[i], rhs.toDoItems[i]) {
+        for index in 0..<lhs.toDoItems.count {
+            if !ToDoItem.haveSameProperties(lhs.toDoItems[index], rhs.toDoItems[index]) {
                 return false
             }
         }
