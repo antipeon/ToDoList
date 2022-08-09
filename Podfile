@@ -4,7 +4,7 @@
 target 'ToDoList' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-
+  pod 'CocoaLumberjack/Swift', '~> 3.7.0'
   # Pods for ToDoList
 
   target 'ToDoListTests' do

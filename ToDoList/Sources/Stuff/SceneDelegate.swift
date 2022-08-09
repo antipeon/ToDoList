@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CocoaLumberjack
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -16,6 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        setUpLogger()
         
         let window = UIWindow(windowScene: windowScene)
         self.window = window
@@ -70,6 +73,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+    
+    private func setUpLogger() {
+        DDLog.add(DDOSLogger.sharedInstance)
+        dynamicLogLevel = DDLogLevel.verbose
     }
 
 

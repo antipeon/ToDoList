@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CocoaLumberjack
 
 protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
@@ -92,11 +93,15 @@ final class ToDoListViewController: UIViewController, ToDoListModule, ToDoListMo
     }
     
     func addItem(_ item: ToDoItem?) throws {
+        DDLogVerbose("trying to add item...")
         try model.addItem(item)
+        DDLogInfo("item added: \(String(describing: item))")
     }
     
     func deleteItem(_ item: ToDoItem?) throws {
+        DDLogVerbose("trying to delete item...")
         try model.deleteItem(item)
+        DDLogInfo("item deleted: \(String(describing: item)) deleted")
     }
     
     func didDeleteItem() {
@@ -254,7 +259,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule, ToDoListMo
     }
     
     private func infoSwiped() {
-        print("do nothing")
+        DDLogError("\(#function) not implemented")
     }
     
     private func moveSwipedItemToDone(in view: UIView) {
