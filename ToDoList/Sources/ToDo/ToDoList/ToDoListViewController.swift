@@ -301,7 +301,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule, ToDoListMo
 extension Array where Element == ToDoItem {
     func orderedByDate() -> [ToDoItem] {
         self.sorted(by: {
-            $0.createdAt < $1.createdAt
+            $0.createdAt > $1.createdAt
         })
     }
 }
