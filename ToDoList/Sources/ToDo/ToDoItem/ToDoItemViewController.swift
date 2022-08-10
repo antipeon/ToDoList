@@ -153,22 +153,16 @@ final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextView
     
     @objc private func keyboardWillShow(notification: NSNotification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-
-            self.view.frame.origin.y = -keyboardSize.height
-            NSLayoutConstraint.deactivate(rootView.viewTopAnchor)
-            rootView.viewTopAnchor = rootView.vStackView.topAnchor.constraint(equalTo: rootView.layoutMarginsGuide.topAnchor, constant: keyboardSize.height)
-            NSLayoutConstraint.activate(rootView.viewTopAnchor)
-            rootView.updateConstraints()
+            NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
+            rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -keyboardSize.height)
+            NSLayoutConstraint.activate(rootView.viewBottomAnchor)
         }
     }
 
     @objc private func keyboardWillHide(notification: NSNotification) {
-        self.view.frame.origin.y = 0
-        
-        NSLayoutConstraint.deactivate(rootView.viewTopAnchor)
-        rootView.viewTopAnchor = rootView.vStackView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor)
-        NSLayoutConstraint.activate(rootView.viewTopAnchor)
-        rootView.updateConstraints()
+        NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
+        rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -ToDoItemView.Constants.defaultOffset)
+        NSLayoutConstraint.activate(rootView.viewBottomAnchor)
     }
 }
 
