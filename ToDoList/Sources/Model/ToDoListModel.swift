@@ -26,7 +26,16 @@ class ToDoListModel {
     
     init() throws {
         fileCache = FileCache()
-        try fileCache.load(from: ToDoListModel.fileName)
+        do {
+            try fileCache.load(from: ToDoListModel.fileName)
+        } catch {
+            let nsError = error as NSError
+            if nsError.domain == NSCocoaErrorDomain, nsError.code == NSFileReadNoSuchFileError {
+                return
+            } else {
+                throw error
+            }
+        }
     }
     
     func addItem(_ item: ToDoItem?) throws {
