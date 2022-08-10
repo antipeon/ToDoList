@@ -9,7 +9,6 @@ import UIKit
 
 final class SwitchSectionView: UIView {
 
-    
     // MARK: - Views
     private lazy var switchSection: UIStackView = {
         let view = UIStackView.makeVStackView()
