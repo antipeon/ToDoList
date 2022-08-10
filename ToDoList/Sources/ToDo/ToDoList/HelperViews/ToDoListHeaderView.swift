@@ -7,7 +7,7 @@
 
 import UIKit
 
-class Header: UITableViewHeaderFooterView {
+final class Header: UITableViewHeaderFooterView {
     
     enum Constants {
         static let reuseIdentifier = "headerId"

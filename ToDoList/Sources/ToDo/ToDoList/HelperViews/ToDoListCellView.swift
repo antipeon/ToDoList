@@ -7,7 +7,7 @@
 
 import UIKit
 
-class Cell: UITableViewCell {
+final class Cell: UITableViewCell {
     enum Constants {
         static let gap: CGFloat = 16
         static let reuseId: String = "cellId"

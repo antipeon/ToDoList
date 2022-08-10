@@ -23,7 +23,7 @@ protocol ToDoItemModule: DismissableModule {
 }
 
 
-class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
+final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
     
     // MARK: - Views
     private lazy var toDoItemView = ToDoItemView(module: self, item: item)

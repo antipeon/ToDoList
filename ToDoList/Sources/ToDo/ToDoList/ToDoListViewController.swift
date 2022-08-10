@@ -12,7 +12,7 @@ protocol ToDoListModule: ToDoItemModule {
     var notDoneItems: [ToDoItem] { get }
 }
 
-class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
+final class ToDoListViewController: UIViewController, ToDoListModule, ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
     
     // MARK: - init
     init(model: ToDoListModel) {

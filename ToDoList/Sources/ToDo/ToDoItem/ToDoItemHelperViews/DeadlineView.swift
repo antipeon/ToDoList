@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DeadlineView: UIView {
+final class DeadlineView: UIView {
 
     // MARK: - Views
     private lazy var calendarButtonAndSwitch: UIStackView = {

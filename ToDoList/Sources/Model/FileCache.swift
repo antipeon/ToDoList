@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FileCache {
+final class FileCache {
     private(set) var toDoItems = [ToDoItem]()
     
     /// Adds item to collection if not present

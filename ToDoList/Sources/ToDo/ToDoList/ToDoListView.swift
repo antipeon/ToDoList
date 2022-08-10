@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ToDoListView: UITableView {
+final class ToDoListView: UITableView {
     
     typealias Module = ToDoListModule & UITableViewDelegate & UITableViewDataSource
     

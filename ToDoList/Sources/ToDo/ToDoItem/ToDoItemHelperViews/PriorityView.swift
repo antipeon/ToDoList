@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PriorityView: UIView {
+final class PriorityView: UIView {
     enum Constants {
         static let prioritySwitchHeight: CGFloat = 36
         static let priorityLabelHeight: CGFloat = 22

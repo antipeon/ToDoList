@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SwitchSectionView: UIView {
+final class SwitchSectionView: UIView {
 
     
     // MARK: - Views

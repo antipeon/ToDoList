@@ -7,7 +7,7 @@
 
 import UIKit
 
-class LastCell: UITableViewCell {
+final class LastCell: UITableViewCell {
     enum Constants {
         static let reuseIdentifier = "lastCellId"
         static var footerWidth: CGFloat = 100

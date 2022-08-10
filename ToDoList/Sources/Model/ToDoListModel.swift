@@ -12,7 +12,7 @@ protocol ToDoListModelDelegate {
     func didDeleteItem()
 }
 
-class ToDoListModel {
+final class ToDoListModel {
     // MARK: - Private vars
     private static let fileName = "toDoItems"
     private var fileCache: FileCache
