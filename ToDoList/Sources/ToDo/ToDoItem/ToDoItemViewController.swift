@@ -17,20 +17,20 @@ extension DismissableModule {
     }
 }
 
-protocol ToDoItemModule: DismissableModule, UITextViewDelegate {
-    func addItem(_ item: ToDoItem?)
-    func deleteItem(_ item: ToDoItem?)
+protocol ToDoItemModule: DismissableModule {
+    func addItem(_ item: ToDoItem?) throws
+    func deleteItem(_ item: ToDoItem?) throws
 }
 
-class ToDoItemViewController: UIViewController, ToDoItemModule {
+
+final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
     
     // MARK: - Views
     private lazy var toDoItemView = ToDoItemView(module: self, item: item)
     
-    private lazy var item: ToDoItem? = fileCache.toDoItems.last
-    
     // MARK: - Properties
-    private let fileCache: FileCache
+    private let module: ToDoItemModule
+    private let item: ToDoItem?
     
     private var rootView: ToDoItemView {
         guard let view = view as? ToDoItemView else {
@@ -39,10 +39,10 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
         return view
     }
     
-    // MARK: - Init
-    init(fileCache: FileCache) {
-        self.fileCache = fileCache
-        try? fileCache.load(from: filename)
+    // MARK: - init
+    init(module: ToDoItemModule, item: ToDoItem?) {
+        self.module = module
+        self.item = item
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,6 +58,7 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpToHideKeyboardOnTapView()
+        setUpObserversForKeyboard()
     }
     
     
@@ -84,9 +85,9 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
     
     // MARK: - TextViewDelegate
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if  textView.textColor == ToDoItemView.Constants.Colors.labelTertiary {
+        if  textView.textColor == AppConstants.Colors.labelTertiary {
             textView.text = nil
-            textView.textColor = ToDoItemView.Constants.Colors.labelPrimary
+            textView.textColor = AppConstants.Colors.labelPrimary
         } else {
             // idk why this === deselection
             textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.endOfDocument)
@@ -104,50 +105,65 @@ class ToDoItemViewController: UIViewController, ToDoItemModule {
         rootView.setNeedsDisplay()
     }
     
-    @objc private func save() {
-        rootView.save()
+    @objc private func save() throws {
+        try rootView.save()
     }
     
     @objc private func cancel() {
         rootView.cancel()
     }
     
-    // MARK: - Portrait Mode
-    override func viewWillAppear(_ animated: Bool) {
-       super.viewWillAppear(animated)
-       
-       AppUtility.lockOrientation(.portrait)
-       // Or to rotate and lock
-       // AppUtility.lockOrientation(.portrait, andRotateTo: .portrait)
-       
-   }
-
-   override func viewWillDisappear(_ animated: Bool) {
-       super.viewWillDisappear(animated)
-       
-       // Don't forget to reset when view is being removed
-       AppUtility.lockOrientation(.all)
-   }
+    // MARK: - Landscape/Portrait Mode
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        prepareViewsAccordingToOrientation()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        prepareViewsAccordingToOrientation()
+    }
+    
+    private func prepareViewsAccordingToOrientation() {
+        if traitCollection.verticalSizeClass == .compact {
+            // landscape
+            rootView.lowerSectionVstackView.isHidden = true
+            rootView.deleteButton.isHidden = true
+        } else {
+            // normal
+            rootView.lowerSectionVstackView.isHidden = false
+            rootView.deleteButton.isHidden = false
+        }
+    }
     
     // MARK: - ToDoItemModule
-    func addItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        fileCache.add(item)
-        try? fileCache.save(to: filename)
+    func addItem(_ item: ToDoItem?) throws {
+        try module.addItem(item)
     }
     
-    func deleteItem(_ item: ToDoItem?) {
-        guard let item = item else {
-            return
-        }
-        fileCache.remove(item)
-        try? fileCache.save(to: filename)
+    func deleteItem(_ item: ToDoItem?) throws {
+        try module.deleteItem(item)
     }
     
-    private let filename = "toDoItems"
+    // MARK: - Keyboard
+    private func setUpObserversForKeyboard() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
+            rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -keyboardSize.height)
+            NSLayoutConstraint.activate(rootView.viewBottomAnchor)
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
+        rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -ToDoItemView.Constants.defaultOffset)
+        NSLayoutConstraint.activate(rootView.viewBottomAnchor)
+    }
 }
 
 extension UIViewController {

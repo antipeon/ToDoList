@@ -7,24 +7,16 @@
 
 import UIKit
 
-class ToDoListView<Module: ToDoListModule>: UIView {
+final class ToDoListView: UITableView {
     
-    // MARK: - Properties
-    private weak var module: Module?
+    typealias Module = ToDoListModule & UITableViewDelegate & UITableViewDataSource
     
-    // MARK: - Views
-    private lazy var button: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Add Item", for: .normal)
-        button.addTarget(self, action: #selector(showAddItem), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    private weak var module: Module!
     
-    // MARK: - Init
+    // MARK: - init
     init(module: Module) {
         self.module = module
-        super.init(frame: .zero)
+        super.init(frame: .zero, style: .insetGrouped)
         setUp()
     }
     
@@ -32,24 +24,20 @@ class ToDoListView<Module: ToDoListModule>: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - SetUp
+    // MARK: - Private funcs
+    private var doneItemsCount: Int {
+        module.doneItemsCount
+    }
+
     private func setUp() {
-        addSubview(button)
-        
-        setupConstraints()
+        backgroundColor = AppConstants.Colors.backPrimary
+        setUpTableView()
     }
     
-    private func setupConstraints() {
-        NSLayoutConstraint.activate(
-            [
-                button.centerXAnchor.constraint(equalTo: centerXAnchor),
-                button.centerYAnchor.constraint(equalTo: centerYAnchor)
-            ]
-        )
-    }
-    
-    // MARK: - Methods
-    @objc private func showAddItem() {
-        module?.showAddItem()
+    private func setUpTableView() {
+        register(Cell.self, forCellReuseIdentifier: Cell.Constants.reuseId)
+        delegate = module
+        dataSource = module
+        reloadData()
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FileCache {
+final class FileCache {
     private(set) var toDoItems = [ToDoItem]()
     
     /// Adds item to collection if not present
@@ -84,12 +84,6 @@ class FileCache {
     enum FileCacheError: Error {
         case jsonConversion
         case jsonDecode
-    }
-}
-
-extension FileCache: Equatable {
-    static func == (lhs: FileCache, rhs: FileCache) -> Bool {
-        lhs.toDoItems == rhs.toDoItems
     }
 }
 
