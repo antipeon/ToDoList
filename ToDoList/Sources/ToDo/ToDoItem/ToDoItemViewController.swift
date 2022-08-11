@@ -22,9 +22,8 @@ protocol ToDoItemModule: DismissableModule {
     func deleteItem(_ item: ToDoItem?) throws
 }
 
-
 final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
-    
+
     // MARK: - Views
     private lazy var toDoItemView = ToDoItemView(module: self, item: item)
 
@@ -163,16 +162,24 @@ final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextView
     }
 
     @objc private func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
-            rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -keyboardSize.height)
-            NSLayoutConstraint.activate(rootView.viewBottomAnchor)
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
+            return
         }
+        let keyboardHeight = keyboardValue.cgRectValue.height
+        NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
+        rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(
+            equalTo: rootView.safeAreaLayoutGuide.bottomAnchor,
+            constant: -keyboardHeight
+        )
+        NSLayoutConstraint.activate(rootView.viewBottomAnchor)
     }
 
     @objc private func keyboardWillHide(notification: NSNotification) {
         NSLayoutConstraint.deactivate(rootView.viewBottomAnchor)
-        rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.bottomAnchor, constant: -ToDoItemView.Constants.defaultOffset)
+        rootView.viewBottomAnchor = rootView.vStackView.bottomAnchor.constraint(
+            equalTo: rootView.safeAreaLayoutGuide.bottomAnchor,
+            constant: -ToDoItemView.Constants.defaultOffset
+        )
         NSLayoutConstraint.activate(rootView.viewBottomAnchor)
     }
 }

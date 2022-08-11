@@ -168,17 +168,26 @@ final class ToDoItemView: UIView {
 
         addSubview(vStackView)
     }
-    
-    lazy var viewBottomAnchor = vStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constants.defaultOffset)
-    
+
+    lazy var viewBottomAnchor = vStackView.bottomAnchor.constraint(
+        equalTo: safeAreaLayoutGuide.bottomAnchor,
+        constant: -Constants.defaultOffset
+    )
+
     private func setUpConstraints() {
         NSLayoutConstraint.activate(
             switchSection.heightAnchor.constraint(equalToConstant: Constants.switchSectionHeight),
 
             lowerSectionVstackView.heightAnchor.constraint(lessThanOrEqualToConstant: Constants.lowerSectionMaxHeight),
-            
-            vStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: Constants.defaultOffset),
-            vStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -Constants.defaultOffset),
+
+            vStackView.leftAnchor.constraint(
+                equalTo: safeAreaLayoutGuide.leftAnchor,
+                constant: Constants.defaultOffset
+            ),
+            vStackView.rightAnchor.constraint(
+                equalTo: safeAreaLayoutGuide.rightAnchor,
+                constant: -Constants.defaultOffset
+            ),
             vStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             viewBottomAnchor,
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.deleteButttonHeight),

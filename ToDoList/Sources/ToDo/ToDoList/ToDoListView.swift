@@ -8,7 +8,7 @@
 import UIKit
 
 final class ToDoListView: UITableView {
-    
+
     typealias Module = ToDoListModule & UITableViewDelegate & UITableViewDataSource
 
     private weak var module: Module!
