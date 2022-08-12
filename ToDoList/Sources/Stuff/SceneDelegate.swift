@@ -26,6 +26,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigationViewController = UINavigationController()
 
         // TODO: handle errors
+        // TODO: fix this shit
         guard let model = try? ToDoListModel() else {
             fatalError("model can't be initialized")
         }

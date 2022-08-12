@@ -18,4 +18,5 @@ protocol NetworkService {
 enum NetworkServiceError: Error {
     case failEditItem
     case failDeleteItem
+    case failGetAll
 }
