@@ -19,7 +19,7 @@ final class ToDoListModel {
 
     // MARK: - API
     var items: [ToDoItem] {
-        fileCache.toDoItems
+        fileCache.toDoItems.orderedByDate()
     }
 
     var delegate: ToDoListModelDelegate?

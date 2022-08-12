@@ -58,6 +58,12 @@ extension ToDoItem: Equatable {
     }
 }
 
+extension ToDoItem: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
+
 extension ToDoItem {
     /// Parses json to toDoItem
     /// - Parameter json: [String: Any]

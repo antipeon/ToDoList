@@ -41,13 +41,26 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private var showOnlyNotDone = true {
         didSet {
-            let firstAndOnlySectionIndex = 0
-            rootView.reloadSections(IndexSet.init(integer: firstAndOnlySectionIndex), with: .automatic)
+            // indexpath to insert
+            let indexes = model.items
+                .indices
+                .filter {
+                    model.items[$0].done
+                }
+                .map {
+                    IndexPath(row: $0, section: 0)
+                }
+
+            if showOnlyNotDone {
+                rootView.deleteRows(at: indexes, with: .fade)
+            } else {
+                rootView.insertRows(at: indexes, with: .fade)
+            }
         }
     }
 
     private var displayedItems: [ToDoItem] {
-        (showOnlyNotDone ? notDoneItems : model.items.orderedByDate())
+        (showOnlyNotDone ? notDoneItems : model.items)
     }
 
     private var swipedRow: IndexPath?
@@ -90,17 +103,19 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             .filter {
                 !$0.done
             }
-            .orderedByDate()
     }
 
     func addItem(_ item: ToDoItem?) throws {
         DDLogVerbose("trying to add item...")
+
+        // TODO: fix this shit
         try model.addItem(item)
         DDLogInfo("item added: \(String(describing: item))")
     }
 
     func deleteItem(_ item: ToDoItem?) throws {
         DDLogVerbose("trying to delete item...")
+        // TODO: fix this shit
         try model.deleteItem(item)
         DDLogInfo("item deleted: \(String(describing: item)) deleted")
     }
@@ -114,8 +129,9 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     }
 
     // MARK: Actions
-    @objc private func toggleShowOnlyDone() {
+    @objc private func toggleItemsShowOption(_ button: UIButton) {
         showOnlyNotDone.toggle()
+        button.setTitle(showOnlyNotDone ? "Показать" : "Скрыть", for: .normal)
     }
 
     @objc private func addEmptyItem() {
@@ -149,7 +165,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         header.doneItemsCountLabel.text = "Выполнено – \(doneItemsCount)"
         header.showDoneItemsButton.setTitle(showOnlyNotDone ? "Показать" : "Скрыть", for: .normal)
-        header.showDoneItemsButton.addTarget(self, action: #selector(toggleShowOnlyDone), for: .touchUpInside)
+        header.showDoneItemsButton.addTarget(self, action: #selector(toggleItemsShowOption), for: .touchUpInside)
         return header
     }
 

@@ -41,7 +41,8 @@ final class Header: UITableViewHeaderFooterView {
     }()
 
     private(set) lazy var showDoneItemsButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
+        button.setTitleColor(UIColor.systemBlue, for: .normal)
         button.titleLabel?.font = AppConstants.Fonts.subheadBold
         return button
     }()
