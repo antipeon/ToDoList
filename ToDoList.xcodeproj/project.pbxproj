@@ -836,7 +836,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C6388F202FC6DAA4293FCB94 /* Pods-ToDoList-ToDoListUITests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NYGY5GQKY5;
@@ -855,7 +855,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E5E0EC7E8B3454A61CAD99A7 /* Pods-ToDoList-ToDoListUITests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = NYGY5GQKY5;
