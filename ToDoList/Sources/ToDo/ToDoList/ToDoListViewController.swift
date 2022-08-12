@@ -75,15 +75,40 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return button
     }()
 
+    lazy var alert: SpinnerView = {
+        SpinnerView(frame: .zero)
+    }()
+
     // MARK: - UIViewController
     override func loadView() {
         super.loadView()
         view = toDoListView
+
+        let loadFailureMessage = "load went wrong"
+
+        model.load { [weak self] result in
+            switch result {
+            case .success:
+                self?.alert.removeFromSuperview()
+                self?.updateViews()
+                return
+            case .failure(let error as FileCacheServiceErrors.LoadError):
+                switch error {
+                case .failLoadNoSuchFile:
+                    return
+                case .failLoad:
+                    fatalError(loadFailureMessage)
+                }
+            case .failure:
+                fatalError(loadFailureMessage)
+            }
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpAddNewItemButton()
+        setUpLoadingAlert()
 
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
@@ -315,6 +340,20 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+
+    private func setUpLoadingAlert() {
+
+        alert.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(alert)
+
+        NSLayoutConstraint.activate(
+            alert.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            alert.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            alert.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            alert.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        )
     }
 
     private enum Constants {
