@@ -18,8 +18,8 @@ extension DismissableModule {
 }
 
 protocol ToDoItemModule: DismissableModule {
-    func addItem(_ item: ToDoItem?) throws
-    func deleteItem(_ item: ToDoItem?) throws
+    func addItem(_ item: ToDoItem?)
+    func deleteItem(_ item: ToDoItem?)
 }
 
 final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
@@ -137,12 +137,12 @@ final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextView
     }
 
     // MARK: - ToDoItemModule
-    func addItem(_ item: ToDoItem?) throws {
-        try module.addItem(item)
+    func addItem(_ item: ToDoItem?) {
+        module.addItem(item)
     }
 
-    func deleteItem(_ item: ToDoItem?) throws {
-        try module.deleteItem(item)
+    func deleteItem(_ item: ToDoItem?) {
+        module.deleteItem(item)
     }
 
     // MARK: - Keyboard

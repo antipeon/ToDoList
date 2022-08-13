@@ -8,16 +8,18 @@
 import Foundation
 
 protocol FileCacheService {
-    // up-to-date toDoItems
+    /// up-to-date toDoItems
     var toDoItems: [ToDoItem] { get }
 
     func save(to file: String, completion: @escaping (Result<Void, Error>) -> Void)
 
     func load(from file: String, completion: @escaping (Result<Void, Error>) -> Void)
 
-    func add(_ newItem: ToDoItem)
+    @discardableResult
+    func add(_ newItem: ToDoItem) -> Result<Void, Error>
 
-    func delete(id: String)
+    @discardableResult
+    func delete(id: String) -> Result<ToDoItem, Error>
 }
 
 enum FileCacheServiceErrors {
@@ -27,5 +29,11 @@ enum FileCacheServiceErrors {
     enum LoadError: Error {
         case failLoad
         case failLoadNoSuchFile
+    }
+    enum AddError: Error {
+        case failAdd
+    }
+    enum DeleteError: Error {
+        case failDelete
     }
 }

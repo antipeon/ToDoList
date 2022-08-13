@@ -218,7 +218,6 @@
 		FA25172B2891D8710036D100 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				FAD6FD6E28A5BA430038DC02 /* Alerts */,
 				FAD6FD6328A52E350038DC02 /* Services */,
 				FA755F342895A6E700327D32 /* Extensions */,
 				FA251726288F592E0036D100 /* Model */,
@@ -290,6 +289,7 @@
 		FAB72ECE289DD361008A6690 /* HelperViews */ = {
 			isa = PBXGroup;
 			children = (
+				FAD6FD6F28A5BA540038DC02 /* Spinner.swift */,
 				FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */,
 				FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */,
 				FAB72ED3289DD449008A6690 /* LastCell.swift */,
@@ -332,14 +332,6 @@
 				FAD6FD6C28A533DE0038DC02 /* MockNetworkService.swift */,
 			);
 			path = Mocks;
-			sourceTree = "<group>";
-		};
-		FAD6FD6E28A5BA430038DC02 /* Alerts */ = {
-			isa = PBXGroup;
-			children = (
-				FAD6FD6F28A5BA540038DC02 /* Spinner.swift */,
-			);
-			path = Alerts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

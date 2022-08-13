@@ -25,7 +25,7 @@ final class MockNetworkService: NetworkService {
                 guard let self = self else {
                     return
                 }
-                
+
                 guard let items = self.jsonToItems(json: json) else {
                     completion(.failure(NetworkServiceError.failGetAll))
                     return
@@ -83,7 +83,7 @@ final class MockNetworkService: NetworkService {
             }
         }
     }
-    
+
     func updateToDoItems(withItems: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
@@ -107,7 +107,7 @@ final class MockNetworkService: NetworkService {
             }
         }
     }
-    
+
     func addToDoItem(item: [ToDoItem], completion: @escaping (Result<ToDoItem, Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {

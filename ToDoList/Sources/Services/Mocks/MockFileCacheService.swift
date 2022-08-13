@@ -54,13 +54,13 @@ final class MockFileCacheService: FileCacheService {
                 assert(!Thread.current.isMainThread)
                 // cancel if previous save in queue
                 if let currentSaveItem = self?.currentSaveItem {
-        //            DDLogVerbose("canceled save operation: \(currentSaveItem)")
                     self?.logQueue.async {
                         let address = Unmanaged.passUnretained(currentSaveItem).toOpaque()
                         DDLogVerbose("canceled save operation: \(currentSaveItem) with address: \(address)")
                     }
                     currentSaveItem.cancel()
                 }
+
                 self?.currentSaveItem = DispatchWorkItem(flags: .barrier) {
                     assert(!Thread.current.isMainThread)
 
@@ -171,20 +171,24 @@ final class MockFileCacheService: FileCacheService {
         }
     }
 
-    func add(_ newItem: ToDoItem) {
+    func add(_ newItem: ToDoItem) -> Result<Void, Error> {
         assert(Thread.current.isMainThread)
-        fileCache.add(newItem)
+        let didAdd = fileCache.add(newItem)
+        return didAdd ? .success(()) : .failure(FileCacheServiceErrors.AddError.failAdd)
     }
 
-    func delete(id: String) {
+    func delete(id: String) -> Result<ToDoItem, Error> {
         assert(Thread.current.isMainThread)
         let itemWithId = ToDoItem(withId: id)
-        fileCache.remove(itemWithId)
+        if let item = fileCache.remove(itemWithId) {
+            return .success(item)
+        }
+        return .failure(FileCacheServiceErrors.DeleteError.failDelete)
     }
 
     private enum Constants {
         static let loadDuration = TimeInterval(6)
-        static let saveDuration = TimeInterval(15)
+        static let saveDuration = TimeInterval(10)
     }
 }
 
