@@ -108,8 +108,7 @@ final class ToDoItemView: UIView {
 
     func save() throws {
         updateModel()
-        // TODO: handle errors
-        try module.addItem(item)
+        module.addItem(item)
         module.dismiss()
     }
 
@@ -296,8 +295,7 @@ final class ToDoItemView: UIView {
     // MARK: - Actions
     @objc private func deleteItem() throws {
         updateModel()
-        // TODO: handle errors
-        try module.deleteItem(item)
+        module.deleteItem(item)
         module.dismiss()
     }
 
