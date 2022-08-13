@@ -12,8 +12,6 @@ final class MockNetworkService: NetworkService {
     // MARK: - Private vars
     private let queriesQueue = DispatchQueue(label: "queriesQ", attributes: .concurrent)
 
-    //
-
     // MARK: API
     func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout()) { [weak self] in
@@ -111,8 +109,8 @@ final class MockNetworkService: NetworkService {
 
         enum MockData {
             static let items = [
-                ToDoItem(withId: "123"),
-                ToDoItem(withId: "qwerty")
+                ToDoItem(text: "homework", priority: .high, createdAt: .now, modifiedAt: .now),
+                ToDoItem(text: "chill", priority: .low, createdAt: .now)
             ]
         }
     }

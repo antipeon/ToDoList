@@ -19,6 +19,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     // MARK: - init
     init(model: ToDoListModel) {
         self.model = model
+        self.network = MockNetworkService()
         super.init(nibName: nil, bundle: nil)
 
         model.delegate = self
@@ -38,6 +39,8 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     private lazy var toDoListView = ToDoListView(module: self)
 
     private let model: ToDoListModel
+
+    private let network: NetworkService
 
     private var showOnlyNotDone = true {
         didSet {
@@ -101,6 +104,17 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
                 }
             case .failure:
                 fatalError(loadFailureMessage)
+            }
+        }
+
+        let fetchFromNetworkErrorMessage = "failed to fetch items from network"
+        let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
+        network.getAllToDoItems { result in
+            switch result {
+            case .success(let items):
+                DDLogVerbose("\(fetchFromNetworkSuccessfulMessage) with items: \(items)")
+            case .failure(let error):
+                DDLogError("\(fetchFromNetworkErrorMessage) with error: \(error.localizedDescription)")
             }
         }
     }
