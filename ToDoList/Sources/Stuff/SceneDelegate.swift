@@ -25,13 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let navigationViewController = UINavigationController()
 
-        // TODO: handle errors
-        // TODO: fix this shit
-        guard let model = try? ToDoListModel() else {
-            fatalError("model can't be initialized")
-        }
-
-        let toDoListViewController = ToDoListViewController(model: model)
+        let toDoListViewController = ToDoListViewController(model: ToDoListModel())
         toDoListViewController.title = "Мои дела"
         navigationViewController.viewControllers = [toDoListViewController]
         toDoListViewController.navigationController?.navigationBar.prefersLargeTitles = true
