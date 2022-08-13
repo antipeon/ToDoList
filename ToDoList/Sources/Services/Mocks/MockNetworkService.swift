@@ -8,7 +8,6 @@
 import Foundation
 
 final class MockNetworkService: NetworkService {
-
     // MARK: - Private vars
     private let queriesQueue = DispatchQueue(label: "queriesQ", attributes: .concurrent)
 
@@ -26,8 +25,13 @@ final class MockNetworkService: NetworkService {
                 guard let self = self else {
                     return
                 }
+                
+                guard let items = self.jsonToItems(json: json) else {
+                    completion(.failure(NetworkServiceError.failGetAll))
+                    return
+                }
 
-                completion(.success(self.jsonToItems(json: json)))
+                completion(.success(items))
             }
         }
     }
@@ -79,6 +83,54 @@ final class MockNetworkService: NetworkService {
             }
         }
     }
+    
+    func updateToDoItems(withItems: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            let data = self.performServerRequest()
+            let json =  self.parseToJson(data: data)
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                guard let items = self.jsonToItems(json: json) else {
+                    completion(.failure(NetworkServiceError.failEditItem))
+                    return
+                }
+
+                completion(.success(items))
+            }
+        }
+    }
+    
+    func addToDoItem(item: [ToDoItem], completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            let data = self.performServerRequest()
+            let json =  self.parseToJson(data: data)
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+
+                guard let item = self.jsonToItem(json: json) else {
+                    completion(.failure(NetworkServiceError.failEditItem))
+                    return
+                }
+
+                completion(.success(item))
+            }
+        }
+    }
 
     // MARK: - Stubs
     private func performServerRequest() -> Data {
@@ -89,7 +141,7 @@ final class MockNetworkService: NetworkService {
         return 0
     }
 
-    private func jsonToItems(json: Any) -> [ToDoItem] {
+    private func jsonToItems(json: Any) -> [ToDoItem]? {
         Constants.MockData.items
     }
 

@@ -135,34 +135,38 @@ final class MockFileCacheService: FileCacheService {
                     return
                 }
 
-                fileCacheWorkQueue.asyncAfter(deadline: .now() + Constants.loadDuration) {
-                    assert(!Thread.current.isMainThread)
-                    do {
-                        do {
-                            try self.fileCache.load(from: file)
-                        } catch {
-                            let nsError = error as NSError
-                            if nsError.domain == NSCocoaErrorDomain, nsError.code == NSFileReadNoSuchFileError {
-                                DispatchQueue.main.async {
-                                    assert(Thread.current.isMainThread)
-                                    completion(.failure(FileCacheServiceErrors.LoadError.failLoadNoSuchFile))
-                                }
-                                return
-                            } else {
-                                throw error
-                            }
-                        }
-                        DispatchQueue.main.async {
-                            assert(Thread.current.isMainThread)
-                            completion(.success(()))
-                        }
-                    } catch {
-                        DispatchQueue.main.async {
-                            assert(Thread.current.isMainThread)
-                            completion(.failure(FileCacheServiceErrors.LoadError.failLoad))
-                        }
-                    }
+                fileCacheWorkQueue.asyncAfter(deadline: .now() + Constants.loadDuration) { [weak self] in
+                    self?.performLoad(for: file, completion: completion)
                 }
+            }
+        }
+    }
+
+    private func performLoad(for file: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        assert(!Thread.current.isMainThread)
+        do {
+            do {
+                try self.fileCache.load(from: file)
+            } catch {
+                let nsError = error as NSError
+                if nsError.domain == NSCocoaErrorDomain, nsError.code == NSFileReadNoSuchFileError {
+                    DispatchQueue.main.async {
+                        assert(Thread.current.isMainThread)
+                        completion(.failure(FileCacheServiceErrors.LoadError.failLoadNoSuchFile))
+                    }
+                    return
+                } else {
+                    throw error
+                }
+            }
+            DispatchQueue.main.async {
+                assert(Thread.current.isMainThread)
+                completion(.success(()))
+            }
+        } catch {
+            DispatchQueue.main.async {
+                assert(Thread.current.isMainThread)
+                completion(.failure(FileCacheServiceErrors.LoadError.failLoad))
             }
         }
     }
@@ -179,7 +183,7 @@ final class MockFileCacheService: FileCacheService {
     }
 
     private enum Constants {
-        static let loadDuration = TimeInterval(1)
+        static let loadDuration = TimeInterval(6)
         static let saveDuration = TimeInterval(15)
     }
 }
