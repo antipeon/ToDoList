@@ -91,7 +91,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         let fetchFromNetworkErrorMessage = "failed to fetch items from network"
         let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
-        
+
         Task {
             do {
                 let items = try await network.getAllToDoItems()

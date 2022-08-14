@@ -8,8 +8,8 @@
 import Foundation
 
 final class MockNetworkService: NetworkService {
-    
-    // MARK: API
+
+    // MARK: - API
     func getAllToDoItems() async throws -> [ToDoItem] {
         try await Task.sleep(seconds: timeout())
         async let items = fetchItems()
@@ -20,7 +20,7 @@ final class MockNetworkService: NetworkService {
     }
 
     func editToDoItem(_ item: ToDoItem) async throws -> ToDoItem {
-        
+
         try await Task.sleep(seconds: timeout())
         async let item = editItem()
         guard let item = await item else {
@@ -30,14 +30,14 @@ final class MockNetworkService: NetworkService {
     }
 
     func deleteToDoItem(at id: String) async throws -> ToDoItem {
-        
+
         try await Task.sleep(seconds: timeout())
         async let item = deleteItem()
         guard let item = await item else {
             throw NetworkServiceError.failDeleteItem
         }
         return item
-        
+
     }
 
     func updateToDoItems(withItems: [ToDoItem]) async throws -> [ToDoItem] {
@@ -74,34 +74,34 @@ final class MockNetworkService: NetworkService {
     private func jsonToItem(json: Any) -> ToDoItem? {
         Constants.MockData.items.first
     }
-    
+
     // MARK: - Private funcs
     private func fetchItems() -> [ToDoItem]? {
         stubGettingItems()
     }
-    
+
     private func deleteItem() -> ToDoItem? {
         stubGettingItem()
     }
-    
+
     private func addItem() -> ToDoItem? {
         stubGettingItem()
     }
-    
+
     private func editItem() -> ToDoItem? {
         stubGettingItem()
     }
-    
+
     private func updateItems() -> [ToDoItem]? {
         stubGettingItems()
     }
-    
+
     private func stubGettingItem() -> ToDoItem? {
         let data = self.performServerRequest()
         let json =  self.parseToJson(data: data)
         return jsonToItem(json: json)
     }
-    
+
     private func stubGettingItems() -> [ToDoItem]? {
         let data = performServerRequest()
         let json = parseToJson(data: data)
@@ -126,7 +126,6 @@ final class MockNetworkService: NetworkService {
         }
     }
 }
-
 
 extension Task where Success == Never, Failure == Never {
     static func sleep(seconds: Double) async throws {
