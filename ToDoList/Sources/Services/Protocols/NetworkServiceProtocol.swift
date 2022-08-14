@@ -16,7 +16,7 @@ protocol NetworkService {
 
     func updateToDoItems(withItems: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void)
 
-    func addToDoItem(item: [ToDoItem], completion: @escaping (Result<ToDoItem, Error>) -> Void)
+    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void)
 }
 
 enum NetworkServiceError: Error {
