@@ -15,3 +15,5 @@ nesting:
   statement_level:
     warning: 5
     error: 10
+line_length:
+  - 170
