@@ -91,11 +91,12 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         let fetchFromNetworkErrorMessage = "failed to fetch items from network"
         let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
-        network.getAllToDoItems { result in
-            switch result {
-            case .success(let items):
+        
+        Task {
+            do {
+                let items = try await network.getAllToDoItems()
                 DDLogVerbose("\(fetchFromNetworkSuccessfulMessage) with items: \(items)")
-            case .failure(let error):
+            } catch {
                 DDLogError("\(fetchFromNetworkErrorMessage) with error: \(error.localizedDescription)")
             }
         }

@@ -8,128 +8,54 @@
 import Foundation
 
 final class MockNetworkService: NetworkService {
-    // MARK: - Private vars
-    private let queriesQueue = DispatchQueue(label: "queriesQ", attributes: .concurrent)
-
+    
     // MARK: API
-    func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        queriesQueue.asyncAfter(deadline: .now() + timeout()) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let data = self.performServerRequest()
-            let json =  self.parseToJson(data: data)
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard let items = self.jsonToItems(json: json) else {
-                    completion(.failure(NetworkServiceError.failGetAll))
-                    return
-                }
-
-                completion(.success(items))
-            }
+    func getAllToDoItems() async throws -> [ToDoItem] {
+        try await Task.sleep(seconds: timeout())
+        async let items = fetchItems()
+        guard let items = await items else {
+            throw NetworkServiceError.failGetAll
         }
+        return items
     }
 
-    func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let data = self.performServerRequest()
-            let json =  self.parseToJson(data: data)
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard let item = self.jsonToItem(json: json) else {
-                    completion(.failure(NetworkServiceError.failEditItem))
-                    return
-                }
-
-                completion(.success(item))
-            }
+    func editToDoItem(_ item: ToDoItem) async throws -> ToDoItem {
+        
+        try await Task.sleep(seconds: timeout())
+        async let item = editItem()
+        guard let item = await item else {
+            throw NetworkServiceError.failEditItem
         }
+        return item
     }
 
-    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let data = self.performServerRequest()
-            let json =  self.parseToJson(data: data)
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard let item = self.jsonToItem(json: json) else {
-                    completion(.failure(NetworkServiceError.failDeleteItem))
-                    return
-                }
-
-                completion(.success(item))
-            }
+    func deleteToDoItem(at id: String) async throws -> ToDoItem {
+        
+        try await Task.sleep(seconds: timeout())
+        async let item = deleteItem()
+        guard let item = await item else {
+            throw NetworkServiceError.failDeleteItem
         }
+        return item
+        
     }
 
-    func updateToDoItems(withItems: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let data = self.performServerRequest()
-            let json =  self.parseToJson(data: data)
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard let items = self.jsonToItems(json: json) else {
-                    completion(.failure(NetworkServiceError.failUpdateItem))
-                    return
-                }
-
-                completion(.success(items))
-            }
+    func updateToDoItems(withItems: [ToDoItem]) async throws -> [ToDoItem] {
+        try await Task.sleep(seconds: timeout())
+        async let items = fetchItems()
+        guard let items = await items else {
+            throw NetworkServiceError.failUpdateItem
         }
+        return items
     }
 
-    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let data = self.performServerRequest()
-            let json =  self.parseToJson(data: data)
-
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-
-                guard let item = self.jsonToItem(json: json) else {
-                    completion(.failure(NetworkServiceError.failAddItem))
-                    return
-                }
-
-                completion(.success(item))
-            }
+    func addToDoItem(item: ToDoItem) async throws -> ToDoItem {
+        try await Task.sleep(seconds: timeout())
+        async let item = addItem()
+        guard let item = await item else {
+            throw NetworkServiceError.failAddItem
         }
+        return item
     }
 
     // MARK: - Stubs
@@ -148,16 +74,49 @@ final class MockNetworkService: NetworkService {
     private func jsonToItem(json: Any) -> ToDoItem? {
         Constants.MockData.items.first
     }
+    
+    // MARK: - Private funcs
+    private func fetchItems() -> [ToDoItem]? {
+        stubGettingItems()
+    }
+    
+    private func deleteItem() -> ToDoItem? {
+        stubGettingItem()
+    }
+    
+    private func addItem() -> ToDoItem? {
+        stubGettingItem()
+    }
+    
+    private func editItem() -> ToDoItem? {
+        stubGettingItem()
+    }
+    
+    private func updateItems() -> [ToDoItem]? {
+        stubGettingItems()
+    }
+    
+    private func stubGettingItem() -> ToDoItem? {
+        let data = self.performServerRequest()
+        let json =  self.parseToJson(data: data)
+        return jsonToItem(json: json)
+    }
+    
+    private func stubGettingItems() -> [ToDoItem]? {
+        let data = performServerRequest()
+        let json = parseToJson(data: data)
+        return jsonToItems(json: json)
+    }
 
     // MARK: - Helpers
-    private func timeout() -> TimeInterval {
-        TimeInterval.random(in: Constants.timeoutLowerBound..<Constants.timeoutHigherBound)
+    private func timeout() -> Double {
+        Double.random(in: Constants.timeoutLowerBound..<Constants.timeoutHigherBound)
     }
 
     private enum Constants {
         static let filename = "queries"
-        static let timeoutLowerBound: TimeInterval = 1
-        static let timeoutHigherBound: TimeInterval = 3
+        static let timeoutLowerBound: Double = 1
+        static let timeoutHigherBound: Double = 3
 
         enum MockData {
             static let items = [
@@ -165,5 +124,13 @@ final class MockNetworkService: NetworkService {
                 ToDoItem(text: "chill", priority: .low, createdAt: .now)
             ]
         }
+    }
+}
+
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: Double) async throws {
+        let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
     }
 }
