@@ -187,7 +187,7 @@ final class MockFileCacheService: FileCacheService {
     }
 
     private enum Constants {
-        static let loadDuration = TimeInterval(6)
+        static let loadDuration = TimeInterval(4)
         static let saveDuration = TimeInterval(10)
     }
 }
