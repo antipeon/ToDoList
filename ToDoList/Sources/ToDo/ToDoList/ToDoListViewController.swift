@@ -108,14 +108,14 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     func addItem(_ item: ToDoItem?) throws {
         DDLogVerbose("trying to add item...")
 
-        // TODO: fix this shit
+        // TODO: handle errors
         try model.addItem(item)
         DDLogInfo("item added: \(String(describing: item))")
     }
 
     func deleteItem(_ item: ToDoItem?) throws {
         DDLogVerbose("trying to delete item...")
-        // TODO: fix this shit
+        // TODO: handle errors
         try model.deleteItem(item)
         DDLogInfo("item deleted: \(String(describing: item)) deleted")
     }
