@@ -257,10 +257,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         if tableView.isLastRowAt(indexPath) {
             return nil
         }
-        let item = displayedItems[indexPath.row]
-        if item.done {
-            return nil
-        }
+        
         let config = UISwipeActionsConfiguration(actions: [doneAction])
         config.performsFirstActionWithFullSwipe = false
         return config
@@ -315,7 +312,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         }
 
         let item = displayedItems[swipedRow.row]
-        let newItem = item.toDone()
+        let newItem = item.toggleDone()
         addItem(newItem)
     }
 
@@ -379,14 +376,14 @@ extension UITableView {
 }
 
 extension ToDoItem {
-    func toDone() -> ToDoItem {
+    func toggleDone() -> ToDoItem {
         ToDoItem(
             id: id,
             text: text,
             priority: priority,
             createdAt: createdAt,
             deadline: deadline,
-            done: true,
+            done: !done,
             modifiedAt: modifiedAt
         )
     }
