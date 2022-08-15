@@ -62,7 +62,7 @@ https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-
 Pods/
 #
 # Add this line if you want to avoid checking in source code from the Xcode workspace
-*.xcworkspace
+# *.xcworkspace
 
 # Carthage
 #
