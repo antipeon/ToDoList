@@ -17,7 +17,7 @@ final class DefaultNetworkingService: NetworkService {
         return session
     }()
 
-    private static var revision: Int32 = 10
+    private static var revision: Int32 = 0
 
     private let syncQueue = DispatchQueue(label: "queriesSyncQ", attributes: .concurrent)
 
@@ -345,7 +345,7 @@ final class DefaultNetworkingService: NetworkService {
             return true
         }
 
-        guard response.statusCode == Constants.ok  else {
+        guard response.statusCode == Constants.StatusCodes.okStatusCode  else {
             DispatchQueue.main.async { [self] in
                 completion(.failure(self.getServerErrorWithCode(response.statusCode)))
             }
@@ -359,13 +359,13 @@ final class DefaultNetworkingService: NetworkService {
 
     private func getServerErrorWithCode(_ code: Int) -> ServerError {
         switch code {
-        case 400:
+        case Constants.StatusCodes.invalidRequest:
             return ServerError.invalidRequest(code: code)
-        case 401:
+        case Constants.StatusCodes.authorizationError:
             return ServerError.authorizationError(code: code)
-        case 404:
+        case Constants.StatusCodes.elementNotFound:
             return ServerError.elementNotFound(code: code)
-        case 500:
+        case Constants.StatusCodes.someError:
             return ServerError.someError(code: code)
         default:
             return ServerError.unknownError(code: code)
@@ -376,7 +376,14 @@ final class DefaultNetworkingService: NetworkService {
     private enum Constants {
         static let sessionTimeout: TimeInterval = 30
         static let baseURL = URL(string: "https://beta.mrdekk.ru/todobackend")
-        static let ok = 200
+
+        enum StatusCodes {
+            static let okStatusCode = 200
+            static let invalidRequest = 400
+            static let authorizationError = 401
+            static let elementNotFound = 404
+            static let someError = 500
+        }
 
         static let listHandle = "list"
         static let token = "EffectiveDetailsOfEnchantingSpectacles"

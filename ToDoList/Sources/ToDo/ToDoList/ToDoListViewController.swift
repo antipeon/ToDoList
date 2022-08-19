@@ -19,7 +19,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     // MARK: - init
     init(model: ToDoListModel) {
         self.model = model
-//        self.network = MockNetworkService()
         self.network = DefaultNetworkingService()
         super.init(nibName: nil, bundle: nil)
 

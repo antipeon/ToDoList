@@ -20,6 +20,7 @@ protocol ToDoListModelDelegate: AnyObject {
 }
 
 final class ToDoListModel {
+
     // MARK: - Private vars
     private static let fileName = "toDoItems"
     private var fileCacheService: FileCacheService
@@ -27,18 +28,19 @@ final class ToDoListModel {
 
     private var isDirty = true
 
-    var items: [ToDoItem] {
-        fileCacheService.toDoItems.orderedByDate()
-    }
-
-    var delegate: ToDoListModelDelegate?
-
+    // MARK: - init
     init() {
         fileCacheService = MockFileCacheService()
         networkService = DefaultNetworkingService()
     }
 
     // MARK: - API
+    var items: [ToDoItem] {
+        fileCacheService.toDoItems.orderedByDate()
+    }
+
+    var delegate: ToDoListModelDelegate?
+
     func load() {
         assert(Thread.current.isMainThread)
 
