@@ -91,50 +91,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         super.loadView()
         view = toDoListView
         model.load()
-
-        let fetchFromNetworkErrorMessage = "failed to fetch items from network"
-        let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
-
-        let group = DispatchGroup()
-        group.enter()
-        network.getAllToDoItems { [self] result in
-            switch result {
-            case .success(let items):
-                self.networkItems = items
-
-//                network.addToDoItem(item: networkItems.first!.replaceId("new-id")) { result in
-//                    switch result {
-//                    case .success(let item):
-//                        DDLogVerbose("added item: \(item)")
-//                    case .failure(let error):
-//                        DDLogError("fail to add item with error: \(error)")
-//                    }
-//                }
-
-//                network.editToDoItem(networkItems.first!.replaceText("much better")) { result in
-//                    switch result {
-//                    case .success(let item):
-//                        DDLogVerbose("edited item: \(item)")
-//                    case .failure(let error):
-//                        DDLogError("fail to edit item with error: \(error)")
-//                    }
-//                }
-
-//                network.deleteToDoItem(at: "shit") { result in
-//                    switch result {
-//                    case .success(let item):
-//                        DDLogVerbose("deleted item: \(item)")
-//                    case .failure(let error):
-//                        DDLogError("fail to delete item with error: \(error)")
-//                    }
-//                }
-
-                DDLogVerbose("\(fetchFromNetworkSuccessfulMessage) with items: \(items)")
-            case .failure(let error):
-                DDLogError("\(fetchFromNetworkErrorMessage) with error: \(error.localizedDescription)")
-            }
-        }
-
     }
 
     override func viewDidLoad() {
@@ -182,14 +138,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     func didLoad() {
         spinner.removeFromSuperview()
-//        network.updateToDoItems(withItems: model.items) { result in
-//            switch result {
-//            case .success(let items):
-//                DDLogVerbose("patched items: \(items)")
-//            case .failure(let error):
-//                DDLogError("failed to patch with error: \(error)")
-//            }
-//        }
         updateViews()
     }
 
@@ -428,30 +376,6 @@ extension ToDoItem {
             createdAt: createdAt,
             deadline: deadline,
             done: !done,
-            modifiedAt: modifiedAt
-        )
-    }
-
-    func replaceText(_ text: String) -> ToDoItem {
-        ToDoItem(
-            id: id,
-            text: text,
-            priority: priority,
-            createdAt: createdAt,
-            deadline: deadline,
-            done: done,
-            modifiedAt: modifiedAt?.advanced(by: 20)
-        )
-    }
-
-    func replaceId(_ id: String) -> ToDoItem {
-        ToDoItem(
-            id: id,
-            text: text,
-            priority: priority,
-            createdAt: createdAt,
-            deadline: deadline,
-            done: done,
             modifiedAt: modifiedAt
         )
     }

@@ -63,17 +63,10 @@ final class ToDoListModel {
             }
 
             let deleteResult = self.fileCacheService.delete(id: item.id)
+
             switch deleteResult {
-            case .success(let item):
-                self.networkService.deleteToDoItem(at: item.id) { [weak self] result in
-                    guard let self = self else {
-                        return
-                    }
-
-                    self.markDirtyIfFailure(result: result)
-
-                    self.processAdd(item: item)
-                }
+            case .success:
+                self.processEdit(item: item)
             case .failure:
                 self.processAdd(item: item)
             }
@@ -125,15 +118,30 @@ final class ToDoListModel {
                 return
             }
 
-            self.markDirtyIfFailure(result: result)
-
-            let addResult = self.fileCacheService.add(item)
-            self.processAddResult(addResult, for: item)
-
-            DDLogVerbose(Constants.SaveMessages.performing)
-
-            self.saveItems()
+            self.addToDoItemCompletion(result, for: item)
         }
+    }
+
+    private func processEdit(item: ToDoItem) {
+        self.networkService.editToDoItem(item) { [weak self] result in
+            guard let self = self else {
+                return
+            }
+
+            self.addToDoItemCompletion(result, for: item)
+
+        }
+    }
+
+    private func addToDoItemCompletion(_ result: Result<ToDoItem, Error>, for item: ToDoItem) {
+        self.markDirtyIfFailure(result: result)
+
+        let addResult = self.fileCacheService.add(item)
+        self.processAddResult(addResult, for: item)
+
+        DDLogVerbose(Constants.SaveMessages.performing)
+
+        self.saveItems()
     }
 
     private func processSaveResult(_ result: Result<Void, Error>) {
