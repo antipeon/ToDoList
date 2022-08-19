@@ -84,7 +84,7 @@ final class MockNetworkService: NetworkService {
         }
     }
 
-    func updateToDoItems(withItems: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+    func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
                 return

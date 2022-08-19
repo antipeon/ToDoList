@@ -24,6 +24,8 @@ final class ToDoListModel {
     private static let fileName = "toDoItems"
     private var fileCache: FileCacheService
 
+    var isDirty = false
+
     // MARK: - API
     var items: [ToDoItem] {
         fileCache.toDoItems.orderedByDate()

@@ -22,6 +22,12 @@
 		FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */; };
 		FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */; };
 		FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F928959FC10099B1A8 /* SceneDelegate.swift */; };
+		FA53B65328AD06E10083B0E8 /* DefaultNetworkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65228AD06E10083B0E8 /* DefaultNetworkingService.swift */; };
+		FA53B65628AD09080083B0E8 /* ToDoItemNetworkingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65528AD09080083B0E8 /* ToDoItemNetworkingModel.swift */; };
+		FA53B65828AD14370083B0E8 /* GetListResponseNetworkingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65728AD14370083B0E8 /* GetListResponseNetworkingModel.swift */; };
+		FA53B65B28AE817B0083B0E8 /* PostItemRequestNetworkingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65A28AE817B0083B0E8 /* PostItemRequestNetworkingModel.swift */; };
+		FA53B65F28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65E28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift */; };
+		FA53B66328AEF5850083B0E8 /* PatchItemsRequestNetworkingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B66228AEF5850083B0E8 /* PatchItemsRequestNetworkingModel.swift */; };
 		FA755F332895A29D00327D32 /* ToDoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F322895A29D00327D32 /* ToDoListView.swift */; };
 		FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F352895A70D00327D32 /* UIView+Extensions.swift */; };
 		FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */; };
@@ -86,6 +92,12 @@
 		FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Extensions.swift"; sourceTree = "<group>"; };
 		FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemViewController.swift; sourceTree = "<group>"; };
 		FA3792F928959FC10099B1A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		FA53B65228AD06E10083B0E8 /* DefaultNetworkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNetworkingService.swift; sourceTree = "<group>"; };
+		FA53B65528AD09080083B0E8 /* ToDoItemNetworkingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemNetworkingModel.swift; sourceTree = "<group>"; };
+		FA53B65728AD14370083B0E8 /* GetListResponseNetworkingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetListResponseNetworkingModel.swift; sourceTree = "<group>"; };
+		FA53B65A28AE817B0083B0E8 /* PostItemRequestNetworkingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostItemRequestNetworkingModel.swift; sourceTree = "<group>"; };
+		FA53B65E28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostItemResponseNetworkingModel.swift; sourceTree = "<group>"; };
+		FA53B66228AEF5850083B0E8 /* PatchItemsRequestNetworkingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchItemsRequestNetworkingModel.swift; sourceTree = "<group>"; };
 		FA755F322895A29D00327D32 /* ToDoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListView.swift; sourceTree = "<group>"; };
 		FA755F352895A70D00327D32 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
@@ -265,6 +277,43 @@
 			path = ToDo;
 			sourceTree = "<group>";
 		};
+		FA53B65428AD08E30083B0E8 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65928AD68720083B0E8 /* Models */,
+				FA53B65228AD06E10083B0E8 /* DefaultNetworkingService.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		FA53B65928AD68720083B0E8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65D28AE81900083B0E8 /* Request */,
+				FA53B65C28AE81880083B0E8 /* Response */,
+				FA53B65528AD09080083B0E8 /* ToDoItemNetworkingModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FA53B65C28AE81880083B0E8 /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65728AD14370083B0E8 /* GetListResponseNetworkingModel.swift */,
+				FA53B65E28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
+		FA53B65D28AE81900083B0E8 /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65A28AE817B0083B0E8 /* PostItemRequestNetworkingModel.swift */,
+				FA53B66228AEF5850083B0E8 /* PatchItemsRequestNetworkingModel.swift */,
+			);
+			path = Request;
+			sourceTree = "<group>";
+		};
 		FA755F342895A6E700327D32 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -310,6 +359,7 @@
 		FAD6FD6328A52E350038DC02 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				FA53B65428AD08E30083B0E8 /* Networking */,
 				FAD6FD6928A5301D0038DC02 /* Mocks */,
 				FAD6FD6828A530060038DC02 /* Protocols */,
 			);
@@ -596,13 +646,17 @@
 				FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */,
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FAD6FD6B28A530350038DC02 /* MockFileCacheService.swift in Sources */,
+				FA53B65B28AE817B0083B0E8 /* PostItemRequestNetworkingModel.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
 				FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */,
 				FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */,
+				FA53B65828AD14370083B0E8 /* GetListResponseNetworkingModel.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
 				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
+				FA53B65F28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift in Sources */,
+				FA53B65328AD06E10083B0E8 /* DefaultNetworkingService.swift in Sources */,
 				FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */,
 				FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */,
 				FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */,
@@ -613,8 +667,10 @@
 				FA251728288F59480036D100 /* ToDoItem.swift in Sources */,
 				FAD6FD6528A52E560038DC02 /* NetworkServiceProtocol.swift in Sources */,
 				FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */,
+				FA53B65628AD09080083B0E8 /* ToDoItemNetworkingModel.swift in Sources */,
 				FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */,
 				FA25172A28905C930036D100 /* FileCache.swift in Sources */,
+				FA53B66328AEF5850083B0E8 /* PatchItemsRequestNetworkingModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
