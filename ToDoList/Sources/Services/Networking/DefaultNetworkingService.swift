@@ -403,7 +403,6 @@ final class DefaultNetworkingService: NetworkService {
     }
 
     enum ServerError: Error {
-//        case invalidRequest = "invalid request"
         case invalidRequest(code: Int)
         case authorizationError(code: Int)
         case elementNotFound(code: Int)
