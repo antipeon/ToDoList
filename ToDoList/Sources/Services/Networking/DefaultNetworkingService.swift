@@ -19,6 +19,13 @@ final class DefaultNetworkingService: NetworkService {
 
     private static var revision: Int32 = 0
 
+    private var token: String = {
+        guard let token = ProcessInfo.processInfo.environment["yandex-api-token"] else {
+            fatalError("invalid token")
+        }
+        return token
+    }()
+
     private let syncQueue = DispatchQueue(label: "queriesSyncQ", attributes: .concurrent)
 
     // MARK: - API
@@ -303,7 +310,7 @@ final class DefaultNetworkingService: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = httpMethodType.rawValue
         request.allHTTPHeaderFields = [
-            "Authorization": "Bearer \(Constants.token)"
+            "Authorization": "Bearer \(token)"
         ]
         return request
     }
@@ -312,7 +319,7 @@ final class DefaultNetworkingService: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = httpMethodType.rawValue
         request.allHTTPHeaderFields = [
-            "Authorization": "Bearer \(Constants.token)",
+            "Authorization": "Bearer \(token)",
             "X-Last-Known-Revision": "\(DefaultNetworkingService.revision)"
         ]
         return request
@@ -386,7 +393,6 @@ final class DefaultNetworkingService: NetworkService {
         }
 
         static let listHandle = "list"
-        static let token = "EffectiveDetailsOfEnchantingSpectacles"
 
         enum HttpMethods: String {
             case post = "POST"
