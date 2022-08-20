@@ -31,6 +31,7 @@
 		FA755F332895A29D00327D32 /* ToDoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F322895A29D00327D32 /* ToDoListView.swift */; };
 		FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F352895A70D00327D32 /* UIView+Extensions.swift */; };
 		FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */; };
+		FA7B95F428B118990002B678 /* ExponentialRetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7B95F328B118990002B678 /* ExponentialRetry.swift */; };
 		FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */; };
 		FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */; };
 		FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */; };
@@ -101,6 +102,7 @@
 		FA755F322895A29D00327D32 /* ToDoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListView.swift; sourceTree = "<group>"; };
 		FA755F352895A70D00327D32 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
+		FA7B95F328B118990002B678 /* ExponentialRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialRetry.swift; sourceTree = "<group>"; };
 		FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
 		FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsColorsConstants.swift; sourceTree = "<group>"; };
 		FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListHeaderView.swift; sourceTree = "<group>"; };
@@ -282,6 +284,7 @@
 			children = (
 				FA53B65928AD68720083B0E8 /* Models */,
 				FA53B65228AD06E10083B0E8 /* DefaultNetworkingService.swift */,
+				FA7B95F328B118990002B678 /* ExponentialRetry.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -654,6 +657,7 @@
 				FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */,
 				FA53B65828AD14370083B0E8 /* GetListResponseNetworkingModel.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
+				FA7B95F428B118990002B678 /* ExponentialRetry.swift in Sources */,
 				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
 				FA53B65F28AE85600083B0E8 /* PostItemResponseNetworkingModel.swift in Sources */,
 				FA53B65328AD06E10083B0E8 /* DefaultNetworkingService.swift in Sources */,
