@@ -17,6 +17,7 @@ protocol ToDoListModelDelegate: AnyObject {
     func didSaveFail()
     func didAddItemFail()
     func didDeleteItemFail()
+    func didSynchronize()
 }
 
 final class ToDoListModel {
@@ -59,19 +60,26 @@ final class ToDoListModel {
             return
         }
 
-        synchronizeDataIfNeeded { [weak self] in
-            guard let self = self else {
-                return
-            }
+        // local work
+        let deleteResult = fileCacheService.delete(id: item.id)
+        let addResult = fileCacheService.add(item)
+        processAddResult(addResult, for: item)
 
-            let deleteResult = self.fileCacheService.delete(id: item.id)
+        DDLogVerbose(Constants.SaveMessages.performing)
 
-            switch deleteResult {
-            case .success:
-                self.processEdit(item: item)
-            case .failure:
-                self.processAdd(item: item)
-            }
+        saveItemsToCache()
+
+        // server work
+        if isDirty {
+            synchronizeWithServer()
+            return
+        }
+
+        switch deleteResult {
+        case .success:
+            requestToEditItem(item)
+        case .failure:
+            requestToAddItem(item)
         }
     }
 
@@ -84,28 +92,23 @@ final class ToDoListModel {
             return
         }
 
-        synchronizeDataIfNeeded { [weak self] in
-            guard let self = self else {
-                return
-            }
+        // local work
+        let result = fileCacheService.delete(id: item.id)
+        processDeleteResult(result, for: item)
 
-            self.networkService.deleteToDoItem(at: item.id) { [weak self] result in
-                guard let self = self else {
-                    return
-                }
+        saveItemsToCache()
 
-                self.markDirtyIfFailure(result: result)
-            }
-
-            let result = self.fileCacheService.delete(id: item.id)
-            self.processDeleteResult(result, for: item)
-
-            self.saveItems()
+        // server work
+        if isDirty {
+            synchronizeWithServer()
+            return
         }
+
+        requestToDeleteItem(item)
     }
 
     // MARK: - Private funcs
-    private func saveItems() {
+    private func saveItemsToCache() {
         DDLogVerbose(Constants.SaveMessages.performing)
 
         fileCacheService.save(to: ToDoListModel.fileName) { [weak self] result in
@@ -114,36 +117,44 @@ final class ToDoListModel {
         }
     }
 
-    private func processAdd(item: ToDoItem) {
-        self.networkService.addToDoItem(item: item) { [weak self] result in
+    private func requestToAddItem(_ item: ToDoItem) {
+        networkService.addToDoItem(item: item) { [weak self] result in
             guard let self = self else {
                 return
             }
 
-            self.addToDoItemCompletion(result, for: item)
+            self.markDirtyIfFailure(result: result)
         }
     }
 
-    private func processEdit(item: ToDoItem) {
-        self.networkService.editToDoItem(item) { [weak self] result in
+    private func requestToEditItem(_ item: ToDoItem) {
+        networkService.editToDoItem(item) { [weak self] result in
             guard let self = self else {
                 return
             }
 
-            self.addToDoItemCompletion(result, for: item)
-
+            self.markDirtyIfFailure(result: result)
         }
     }
 
-    private func addToDoItemCompletion(_ result: Result<ToDoItem, Error>, for item: ToDoItem) {
-        self.markDirtyIfFailure(result: result)
+    private func requestToDeleteItem(_ item: ToDoItem) {
+        networkService.deleteToDoItem(at: item.id) { [weak self] result in
+            guard let self = self else {
+                return
+            }
 
-        let addResult = self.fileCacheService.add(item)
-        self.processAddResult(addResult, for: item)
+            self.markDirtyIfFailure(result: result)
+        }
+    }
 
-        DDLogVerbose(Constants.SaveMessages.performing)
+    private func synchronizeWithServer() {
+        networkService.updateToDoItems(withItems: items) { [weak self] result in
+            guard let self = self else {
+                return
+            }
 
-        self.saveItems()
+            self.synchronizeCallback(result: result)
+        }
     }
 
     private func processSaveResult(_ result: Result<Void, Error>) {
@@ -162,7 +173,9 @@ final class ToDoListModel {
         case .success:
             DDLogVerbose(Constants.LoadMessages.successful)
 
-            synchronizeData {}
+            synchronizeWithServer()
+
+            self.delegate?.didLoad()
 
         case .failure(let error as FileCacheServiceErrors.LoadError):
 
@@ -170,7 +183,7 @@ final class ToDoListModel {
             case .failLoadNoSuchFile:
                 DDLogVerbose(Constants.LoadMessages.noCache)
 
-                synchronizeDataAfterLoadIfNoFile()
+                synchronizeWithServerIfNoFileInCache()
 
             case .failLoad:
                 DDLogError("\(Constants.LoadMessages.fail): \(error.localizedDescription)")
@@ -192,26 +205,7 @@ final class ToDoListModel {
         }
     }
 
-    private func synchronizeData(completion: @escaping () -> Void) {
-        networkService.updateToDoItems(withItems: items) { [weak self] result in
-            guard let self = self else {
-                return
-            }
-
-            self.synchronizeCallback(result: result)
-            completion()
-        }
-    }
-
-    private func synchronizeDataIfNeeded(completion: @escaping () -> Void) {
-        if isDirty {
-            synchronizeData(completion: completion)
-            return
-        }
-        completion()
-    }
-
-    private func synchronizeDataAfterLoadIfNoFile() {
+    private func synchronizeWithServerIfNoFileInCache() {
         networkService.getAllToDoItems { [weak self] result in
             guard let self = self else {
                 return
@@ -225,12 +219,12 @@ final class ToDoListModel {
         switch result {
         case .failure:
             self.isDirty = true
+            DDLogVerbose(Constants.SynchronizationMessages.fail)
         case .success(let itemsFromServer):
+            DDLogVerbose(Constants.SynchronizationMessages.successful)
             replaceItemsWithNewItemsWith(itemsFromServer)
             self.isDirty = false
         }
-
-        self.delegate?.didLoad()
     }
 
     private func processDeleteResult(_ result: Result<ToDoItem, Error>, for item: ToDoItem) {
@@ -257,7 +251,8 @@ final class ToDoListModel {
 
     private func replaceItemsWithNewItemsWith(_ items: [ToDoItem]) {
         fileCacheService.replaceItemsWithNewItems(items)
-        saveItems()
+        delegate?.didSynchronize()
+        saveItemsToCache()
     }
 
     // MARK: - Constants
@@ -279,6 +274,10 @@ final class ToDoListModel {
             static let successful = "load successful"
             static let fail = "load failed with error"
             static let noCache = "load - no cache found"
+        }
+        enum SynchronizationMessages {
+            static let successful = "synchronization successful"
+            static let fail = "synchronization unsuccessful"
         }
     }
 }

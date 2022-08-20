@@ -140,6 +140,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         updateViews()
     }
 
+    func didSynchronize() {
+        updateViews()
+    }
+
     func didLoadFail() {}
 
     func didSaveFail() {}
