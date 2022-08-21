@@ -1,5 +1,5 @@
 //
-//  DefaultNetworkingService.swift
+//  DefaultNetworkService.swift
 //  ToDoList
 //
 //  Created by Samat Gaynutdinov on 17.08.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import CocoaLumberjack
 
-final class DefaultNetworkingService: NetworkService {
+final class DefaultNetworkService: NetworkService {
 
     // MARK: - Private vars
     private let session: URLSession = {
@@ -61,7 +61,7 @@ final class DefaultNetworkingService: NetworkService {
                     return
                 }
 
-                guard let model = try? JSONDecoder().decode(GetListResponseNetworkingModel.self, from: data) else {
+                guard let model = try? JSONDecoder().decode(GetListResponseModel.self, from: data) else {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.jsonDecode))
                     }
@@ -70,7 +70,7 @@ final class DefaultNetworkingService: NetworkService {
 
                 let items = model.list.map { ToDoItem(from: $0) }
 
-                DefaultNetworkingService.revision = model.revision
+                DefaultNetworkService.revision = model.revision
 
                 DispatchQueue.main.async {
                     completion(.success(items))
@@ -87,7 +87,7 @@ final class DefaultNetworkingService: NetworkService {
                 return
             }
 
-            let model = PostItemRequestNetworkingModel(from: item)
+            let model = PostItemRequestModel(from: item)
 
             guard let url = self.getUrl(handle: Constants.listHandle)?.appendingPathComponent(item.id) else {
                 DispatchQueue.main.async {
@@ -116,7 +116,7 @@ final class DefaultNetworkingService: NetworkService {
                     return
                 }
 
-                guard let model = try? JSONDecoder().decode(PostItemResponseNetworkingModel.self, from: data) else {
+                guard let model = try? JSONDecoder().decode(PostItemResponseModel.self, from: data) else {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.jsonDecode))
                     }
@@ -125,7 +125,7 @@ final class DefaultNetworkingService: NetworkService {
 
                 let item = ToDoItem(from: model.element)
 
-                DefaultNetworkingService.revision = model.revision
+                DefaultNetworkService.revision = model.revision
 
                 DispatchQueue.main.async {
                     completion(.success(item))
@@ -169,7 +169,7 @@ final class DefaultNetworkingService: NetworkService {
                     return
                 }
 
-                guard let model = try? JSONDecoder().decode(PostItemResponseNetworkingModel.self, from: data) else {
+                guard let model = try? JSONDecoder().decode(PostItemResponseModel.self, from: data) else {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.jsonDecode))
                     }
@@ -178,7 +178,7 @@ final class DefaultNetworkingService: NetworkService {
 
                 let item = ToDoItem(from: model.element)
 
-                DefaultNetworkingService.revision = model.revision
+                DefaultNetworkService.revision = model.revision
 
                 DispatchQueue.main.async {
                     completion(.success(item))
@@ -195,7 +195,7 @@ final class DefaultNetworkingService: NetworkService {
                 return
             }
 
-            let model = PatchItemsRequestNetworkingModel(with: items)
+            let model = PatchItemsRequestModel(with: items)
 
             guard let url = self.getUrl(handle: Constants.listHandle) else {
                 DispatchQueue.main.async {
@@ -224,7 +224,7 @@ final class DefaultNetworkingService: NetworkService {
                     return
                 }
 
-                guard let model = try? JSONDecoder().decode(GetListResponseNetworkingModel.self, from: data) else {
+                guard let model = try? JSONDecoder().decode(GetListResponseModel.self, from: data) else {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.jsonDecode))
                     }
@@ -233,7 +233,7 @@ final class DefaultNetworkingService: NetworkService {
 
                 let items = model.list.map { ToDoItem(from: $0) }
 
-                DefaultNetworkingService.revision = model.revision
+                DefaultNetworkService.revision = model.revision
 
                 DispatchQueue.main.async {
                     completion(.success(items))
@@ -251,7 +251,7 @@ final class DefaultNetworkingService: NetworkService {
                 return
             }
 
-            let model = PostItemRequestNetworkingModel(from: item)
+            let model = PostItemRequestModel(from: item)
 
             guard let url = self.getUrl(handle: Constants.listHandle) else {
                 DispatchQueue.main.async {
@@ -280,7 +280,7 @@ final class DefaultNetworkingService: NetworkService {
                     return
                 }
 
-                guard let model = try? JSONDecoder().decode(PostItemResponseNetworkingModel.self, from: data) else {
+                guard let model = try? JSONDecoder().decode(PostItemResponseModel.self, from: data) else {
                     DispatchQueue.main.async {
                         completion(.failure(NetworkError.jsonDecode))
                     }
@@ -289,7 +289,7 @@ final class DefaultNetworkingService: NetworkService {
 
                 let item = ToDoItem(from: model.element)
 
-                DefaultNetworkingService.revision = model.revision
+                DefaultNetworkService.revision = model.revision
 
                 DispatchQueue.main.async {
                     completion(.success(item))
@@ -320,7 +320,7 @@ final class DefaultNetworkingService: NetworkService {
         request.httpMethod = httpMethodType.rawValue
         request.allHTTPHeaderFields = [
             "Authorization": "Bearer \(token)",
-            "X-Last-Known-Revision": "\(DefaultNetworkingService.revision)"
+            "X-Last-Known-Revision": "\(DefaultNetworkService.revision)"
         ]
         return request
     }

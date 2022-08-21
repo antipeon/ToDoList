@@ -1,5 +1,5 @@
 //
-//  ToDoItemNetworkingModel.swift
+//  ToDoItemNetworkModel.swift
 //  ToDoList
 //
 //  Created by Samat Gaynutdinov on 17.08.2022.
@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct ToDoItemNetworkingModel: Codable {
+struct ToDoItemNetworkModel: Codable {
     typealias Timestamp = Int
 
     let id: String
     let text: String
-    let priority: ToDoItemNetworkingModel.Priority
+    let priority: ToDoItemNetworkModel.Priority
     let deadline: Timestamp?
     let done: Bool
     let createdAt: Timestamp
@@ -23,7 +23,6 @@ struct ToDoItemNetworkingModel: Codable {
         id = item.id
         text = item.text
         priority = .init(from: item.priority)
-//        priority = ToDoItemNetworkingModel.Priority.makePriority(from: item.priority)
         createdAt = item.createdAt.timeStamp
         deadline = item.deadline?.timeStamp
         done = item.done
@@ -55,7 +54,7 @@ extension ToDoItem.Priority: Codable {
 }
 
 extension ToDoItem.Priority {
-    init(from networkingModelPriority: ToDoItemNetworkingModel.Priority) {
+    init(from networkingModelPriority: ToDoItemNetworkModel.Priority) {
         switch networkingModelPriority {
         case .low:
             self = .low
@@ -67,7 +66,7 @@ extension ToDoItem.Priority {
     }
 }
 
-extension ToDoItemNetworkingModel.Priority {
+extension ToDoItemNetworkModel.Priority {
     init(from toDoItemPriority: ToDoItem.Priority) {
         switch toDoItemPriority {
         case .low:
@@ -78,21 +77,10 @@ extension ToDoItemNetworkingModel.Priority {
             self = .important
         }
     }
-//
-//    static func makePriority(from toDoItemPriority: ToDoItem.Priority) -> ToDoItemNetworkingModel.Priority {
-//        switch toDoItemPriority {
-//        case .low:
-//            return .low
-//        case .normal:
-//            return .basic
-//        case .high:
-//            return .important
-//        }
-//    }
 }
 
 extension ToDoItem {
-    init(from networkingModel: ToDoItemNetworkingModel) {
+    init(from networkingModel: ToDoItemNetworkModel) {
 
         self.init(
             id: networkingModel.id,

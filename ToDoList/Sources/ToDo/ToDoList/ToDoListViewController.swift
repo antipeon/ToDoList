@@ -14,15 +14,17 @@ protocol ToDoListModule: ToDoItemModule {
 }
 
 final class ToDoListViewController: UIViewController, ToDoListModule,
-                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
+                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
 
     // MARK: - init
-    init(model: ToDoListModel) {
+    init(model: ToDoListModel, observer: NetworkServiceObserver) {
         self.model = model
-        self.network = DefaultNetworkingService()
+        self.network = DefaultNetworkService()
+        self.networkServiceObserver = observer
         super.init(nibName: nil, bundle: nil)
 
         model.delegate = self
+        networkServiceObserver.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -40,6 +42,8 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     private lazy var toDoListView = ToDoListView(module: self)
 
     private let model: ToDoListModel
+
+    private let networkServiceObserver: NetworkServiceObserver
 
     private let network: NetworkService
 
@@ -79,8 +83,13 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return button
     }()
 
-    lazy var spinner: SpinnerView = {
+    private lazy var spinner: SpinnerView = {
         SpinnerView(frame: .zero)
+    }()
+
+    private lazy var networkSpinner: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        return view
     }()
 
     private var networkItems: [ToDoItem]!
@@ -96,9 +105,16 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         super.viewDidLoad()
         setUpAddNewItemButton()
         setUpSpinner()
+        setUpNetworkSpinner()
 
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
+    }
+
+    override var navigationItem: UINavigationItem {
+        let item = UINavigationItem(title: "Мои дела")
+        item.rightBarButtonItem = UIBarButtonItem(customView: networkSpinner)
+        return item
     }
 
     // MARK: - ToDoListModule
@@ -311,6 +327,15 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         addItem(newItem)
     }
 
+    // MARK: - NetworkServiceObserverDelegate
+    func didNetworkWorkStart() {
+        networkSpinner.startAnimating()
+    }
+
+    func didNetworkWorkFinish() {
+        networkSpinner.stopAnimating()
+    }
+
     // MARK: - Private funcs
     private func updateViews() {
         rootView.reloadData()
@@ -348,6 +373,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             spinner.widthAnchor.constraint(equalToConstant: Constants.spinnerSize),
             spinner.heightAnchor.constraint(equalToConstant: Constants.spinnerSize)
         )
+    }
+
+    private func setUpNetworkSpinner() {
+        networkSpinner.hidesWhenStopped = true
     }
 
     private enum Constants {

@@ -46,9 +46,9 @@ final class ToDoListModel {
     }()
 
     // MARK: - init
-    init() {
+    init(networkService: NetworkService) {
         fileCacheService = MockFileCacheService()
-        networkService = DefaultNetworkingService()
+        self.networkService = networkService
     }
 
     // MARK: - API
@@ -221,8 +221,9 @@ final class ToDoListModel {
             }
 
             switch result {
-            case .success:
+            case .success(let items):
                 DDLogVerbose("successfuly fetched list from server")
+                self.replaceItemsWithNewItems(items)
             case .failure(let error):
                 DDLogVerbose("failed to fetch list from server with error: \(error.localizedDescription)")
             }
