@@ -123,7 +123,8 @@ final class ToDoListModel {
                 return
             }
 
-            self.markDirtyIfFailure(result: result)
+            self.logAddItemOnServer(result)
+            self.markDirtyIfFailure(result)
         }
     }
 
@@ -133,7 +134,8 @@ final class ToDoListModel {
                 return
             }
 
-            self.markDirtyIfFailure(result: result)
+            self.logEditItemOnServer(result)
+            self.markDirtyIfFailure(result)
         }
     }
 
@@ -143,7 +145,8 @@ final class ToDoListModel {
                 return
             }
 
-            self.markDirtyIfFailure(result: result)
+            self.logDeleteItemOnServer(result)
+            self.markDirtyIfFailure(result)
         }
     }
 
@@ -185,6 +188,8 @@ final class ToDoListModel {
 
                 synchronizeWithServerIfNoFileInCache()
 
+                self.delegate?.didLoad()
+
             case .failLoad:
                 DDLogError("\(Constants.LoadMessages.fail): \(error.localizedDescription)")
                 delegate?.didLoadFail()
@@ -196,7 +201,7 @@ final class ToDoListModel {
         }
     }
 
-    private func markDirtyIfFailure<T>(result: Result<T, Error>) {
+    private func markDirtyIfFailure<T>(_ result: Result<T, Error>) {
         switch result {
         case .success:
             return
@@ -222,7 +227,7 @@ final class ToDoListModel {
             DDLogVerbose(Constants.SynchronizationMessages.fail)
         case .success(let itemsFromServer):
             DDLogVerbose(Constants.SynchronizationMessages.successful)
-            replaceItemsWithNewItemsWith(itemsFromServer)
+            replaceItemsWithNewItems(itemsFromServer)
             self.isDirty = false
         }
     }
@@ -249,10 +254,37 @@ final class ToDoListModel {
         }
     }
 
-    private func replaceItemsWithNewItemsWith(_ items: [ToDoItem]) {
+    private func replaceItemsWithNewItems(_ items: [ToDoItem]) {
         fileCacheService.replaceItemsWithNewItems(items)
         delegate?.didSynchronize()
         saveItemsToCache()
+    }
+
+    private func logEditItemOnServer(_ result: Result<ToDoItem, Error>) {
+        switch result {
+        case .success:
+            DDLogVerbose(Constants.ServerEditMessages.sucessful)
+        case .failure:
+            DDLogVerbose(Constants.ServerEditMessages.fail)
+        }
+    }
+
+    private func logAddItemOnServer(_ result: Result<ToDoItem, Error>) {
+        switch result {
+        case .success:
+            DDLogVerbose(Constants.ServerAddMessages.sucessful)
+        case .failure:
+            DDLogVerbose(Constants.ServerAddMessages.fail)
+        }
+    }
+
+    private func logDeleteItemOnServer(_ result: Result<ToDoItem, Error>) {
+        switch result {
+        case .success:
+            DDLogVerbose(Constants.ServerDeleteMessages.sucessful)
+        case .failure:
+            DDLogVerbose(Constants.ServerDeleteMessages.fail)
+        }
     }
 
     // MARK: - Constants
@@ -278,6 +310,18 @@ final class ToDoListModel {
         enum SynchronizationMessages {
             static let successful = "synchronization successful"
             static let fail = "synchronization unsuccessful"
+        }
+        enum ServerAddMessages {
+            static let sucessful = "successfuly added item on server"
+            static let fail = "failed to add item on sever"
+        }
+        enum ServerDeleteMessages {
+            static let sucessful = "successfuly deleted item on server"
+            static let fail = "failed to delete item on server"
+        }
+        enum ServerEditMessages {
+            static let sucessful = "successfuly edited item on server"
+            static let fail = "failed to edit item on server"
         }
     }
 }
