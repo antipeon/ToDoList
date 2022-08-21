@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ToDoListModelDelegate {
+protocol ToDoListModelDelegate: AnyObject {
     func didAddItem()
     func didDeleteItem()
 }
@@ -16,14 +16,14 @@ final class ToDoListModel {
     // MARK: - Private vars
     private static let fileName = "toDoItems"
     private var fileCache: FileCache
-    
+
     // MARK: - API
     var items: [ToDoItem] {
-        fileCache.toDoItems
+        fileCache.toDoItems.orderedByDate()
     }
-    
+
     var delegate: ToDoListModelDelegate?
-    
+
     init() throws {
         fileCache = FileCache()
         do {
@@ -37,7 +37,7 @@ final class ToDoListModel {
             }
         }
     }
-    
+
     func addItem(_ item: ToDoItem?) throws {
         defer {
             delegate?.didAddItem()
@@ -49,7 +49,7 @@ final class ToDoListModel {
         fileCache.add(item)
         try fileCache.save(to: ToDoListModel.fileName)
     }
-    
+
     func deleteItem(_ item: ToDoItem?) throws {
         defer {
             delegate?.didDeleteItem()
