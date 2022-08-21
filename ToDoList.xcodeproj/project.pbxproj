@@ -34,6 +34,11 @@
 		FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED8289ECA77008A6690 /* PriorityView.swift */; };
 		FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDA289ED726008A6690 /* DeadlineView.swift */; };
 		FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */; };
+		FAD6FD6528A52E560038DC02 /* NetworkServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD6FD6428A52E560038DC02 /* NetworkServiceProtocol.swift */; };
+		FAD6FD6728A52F040038DC02 /* FileCacheServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD6FD6628A52F040038DC02 /* FileCacheServiceProtocol.swift */; };
+		FAD6FD6B28A530350038DC02 /* MockFileCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD6FD6A28A530350038DC02 /* MockFileCacheService.swift */; };
+		FAD6FD6D28A533DE0038DC02 /* MockNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD6FD6C28A533DE0038DC02 /* MockNetworkService.swift */; };
+		FAD6FD7028A5BA540038DC02 /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD6FD6F28A5BA540038DC02 /* Spinner.swift */; };
 		FD7FC2700DA851147F6B0B9F /* Pods_ToDoListTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1887E0EA782A7671EBE09282 /* Pods_ToDoListTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +98,11 @@
 		FAB72ED8289ECA77008A6690 /* PriorityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityView.swift; sourceTree = "<group>"; };
 		FAB72EDA289ED726008A6690 /* DeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeadlineView.swift; sourceTree = "<group>"; };
 		FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchSectionView.swift; sourceTree = "<group>"; };
+		FAD6FD6428A52E560038DC02 /* NetworkServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceProtocol.swift; sourceTree = "<group>"; };
+		FAD6FD6628A52F040038DC02 /* FileCacheServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCacheServiceProtocol.swift; sourceTree = "<group>"; };
+		FAD6FD6A28A530350038DC02 /* MockFileCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFileCacheService.swift; sourceTree = "<group>"; };
+		FAD6FD6C28A533DE0038DC02 /* MockNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkService.swift; sourceTree = "<group>"; };
+		FAD6FD6F28A5BA540038DC02 /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +218,7 @@
 		FA25172B2891D8710036D100 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				FAD6FD6328A52E350038DC02 /* Services */,
 				FA755F342895A6E700327D32 /* Extensions */,
 				FA251726288F592E0036D100 /* Model */,
 				FA3792F328958E9E0099B1A8 /* Stuff */,
@@ -278,6 +289,7 @@
 		FAB72ECE289DD361008A6690 /* HelperViews */ = {
 			isa = PBXGroup;
 			children = (
+				FAD6FD6F28A5BA540038DC02 /* Spinner.swift */,
 				FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */,
 				FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */,
 				FAB72ED3289DD449008A6690 /* LastCell.swift */,
@@ -293,6 +305,33 @@
 				FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */,
 			);
 			path = ToDoItemHelperViews;
+			sourceTree = "<group>";
+		};
+		FAD6FD6328A52E350038DC02 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FAD6FD6928A5301D0038DC02 /* Mocks */,
+				FAD6FD6828A530060038DC02 /* Protocols */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		FAD6FD6828A530060038DC02 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				FAD6FD6428A52E560038DC02 /* NetworkServiceProtocol.swift */,
+				FAD6FD6628A52F040038DC02 /* FileCacheServiceProtocol.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		FAD6FD6928A5301D0038DC02 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				FAD6FD6A28A530350038DC02 /* MockFileCacheService.swift */,
+				FAD6FD6C28A533DE0038DC02 /* MockNetworkService.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -551,9 +590,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAD6FD6D28A533DE0038DC02 /* MockNetworkService.swift in Sources */,
+				FAD6FD6728A52F040038DC02 /* FileCacheServiceProtocol.swift in Sources */,
 				FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */,
 				FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */,
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
+				FAD6FD6B28A530350038DC02 /* MockFileCacheService.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
@@ -567,7 +609,9 @@
 				FA755F332895A29D00327D32 /* ToDoListView.swift in Sources */,
 				FA25172D2891D8CA0036D100 /* ToDoItemView.swift in Sources */,
 				FA2516F7288F56420036D100 /* AppDelegate.swift in Sources */,
+				FAD6FD7028A5BA540038DC02 /* Spinner.swift in Sources */,
 				FA251728288F59480036D100 /* ToDoItem.swift in Sources */,
+				FAD6FD6528A52E560038DC02 /* NetworkServiceProtocol.swift in Sources */,
 				FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */,
 				FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */,
 				FA25172A28905C930036D100 /* FileCache.swift in Sources */,

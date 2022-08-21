@@ -14,11 +14,12 @@ protocol ToDoListModule: ToDoItemModule {
 }
 
 final class ToDoListViewController: UIViewController, ToDoListModule,
-                                        ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
+                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - init
     init(model: ToDoListModel) {
         self.model = model
+        self.network = MockNetworkService()
         super.init(nibName: nil, bundle: nil)
 
         model.delegate = self
@@ -28,16 +29,19 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: Private vars
+    // MARK: - Private vars
     private var rootView: ToDoListView {
         guard let view = view as? ToDoListView else {
             fatalError("view \(String(describing: view)) not initialised")
         }
         return view
     }
+
     private lazy var toDoListView = ToDoListView(module: self)
 
     private let model: ToDoListModel
+
+    private let network: NetworkService
 
     private var showOnlyNotDone = true {
         didSet {
@@ -75,15 +79,32 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return button
     }()
 
+    lazy var spinner: SpinnerView = {
+        SpinnerView(frame: .zero)
+    }()
+
     // MARK: - UIViewController
     override func loadView() {
         super.loadView()
         view = toDoListView
+        model.load()
+
+        let fetchFromNetworkErrorMessage = "failed to fetch items from network"
+        let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
+        network.getAllToDoItems { result in
+            switch result {
+            case .success(let items):
+                DDLogVerbose("\(fetchFromNetworkSuccessfulMessage) with items: \(items)")
+            case .failure(let error):
+                DDLogError("\(fetchFromNetworkErrorMessage) with error: \(error.localizedDescription)")
+            }
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpAddNewItemButton()
+        setUpSpinner()
 
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
@@ -105,19 +126,12 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             }
     }
 
-    func addItem(_ item: ToDoItem?) throws {
-        DDLogVerbose("trying to add item...")
-
-        // TODO: handle errors
-        try model.addItem(item)
-        DDLogInfo("item added: \(String(describing: item))")
+    func addItem(_ item: ToDoItem?) {
+        model.addItem(item)
     }
 
-    func deleteItem(_ item: ToDoItem?) throws {
-        DDLogVerbose("trying to delete item...")
-        // TODO: handle errors
-        try model.deleteItem(item)
-        DDLogInfo("item deleted: \(String(describing: item)) deleted")
+    func deleteItem(_ item: ToDoItem?) {
+        model.deleteItem(item)
     }
 
     func didDeleteItem() {
@@ -128,7 +142,22 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         updateViews()
     }
 
-    // MARK: Actions
+    func didSave() {}
+
+    func didLoad() {
+        spinner.removeFromSuperview()
+        updateViews()
+    }
+
+    func didLoadFail() {}
+
+    func didSaveFail() {}
+
+    func didAddItemFail() {}
+
+    func didDeleteItemFail() {}
+
+    // MARK: - Actions
     @objc private func toggleItemsShowOption(_ button: UIButton) {
         showOnlyNotDone.toggle()
         button.setTitle(showOnlyNotDone ? "Показать" : "Скрыть", for: .normal)
@@ -273,8 +302,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             return
         }
         let item = displayedItems[swipedRow.row]
-        // TODO: handle error
-        try? deleteItem(item)
+        deleteItem(item)
     }
 
     private func infoSwiped() {
@@ -288,8 +316,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         let item = displayedItems[swipedRow.row]
         let newItem = item.toDone()
-        // TODO: handle error
-        try? addItem(newItem)
+        addItem(newItem)
     }
 
     // MARK: - Private funcs
@@ -317,8 +344,23 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         ])
     }
 
+    private func setUpSpinner() {
+
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(spinner)
+
+        NSLayoutConstraint.activate(
+            spinner.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            spinner.widthAnchor.constraint(equalToConstant: Constants.spinnerSize),
+            spinner.heightAnchor.constraint(equalToConstant: Constants.spinnerSize)
+        )
+    }
+
     private enum Constants {
         static let newItemButtonSize: CGFloat = 44
+        static let spinnerSize: CGFloat = 100
     }
 }
 
