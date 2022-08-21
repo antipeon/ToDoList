@@ -23,6 +23,7 @@
 		FA2ECA8928B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8828B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift */; };
 		FA2ECA8B28B27F01005A85B6 /* NetworkServiceObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8A28B27F01005A85B6 /* NetworkServiceObserver.swift */; };
 		FA2ECA8D28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8C28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift */; };
+		FA2ECA9028B2C559005A85B6 /* YandexOauthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */; };
 		FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */; };
 		FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F928959FC10099B1A8 /* SceneDelegate.swift */; };
 		FA53B65328AD06E10083B0E8 /* DefaultNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65228AD06E10083B0E8 /* DefaultNetworkService.swift */; };
@@ -97,6 +98,7 @@
 		FA2ECA8828B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableDefaultNetworkingService.swift; sourceTree = "<group>"; };
 		FA2ECA8A28B27F01005A85B6 /* NetworkServiceObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceObserver.swift; sourceTree = "<group>"; };
 		FA2ECA8C28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceObserverImpl.swift; sourceTree = "<group>"; };
+		FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YandexOauthController.swift; sourceTree = "<group>"; };
 		FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemViewController.swift; sourceTree = "<group>"; };
 		FA3792F928959FC10099B1A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		FA53B65228AD06E10083B0E8 /* DefaultNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNetworkService.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 		FA25172B2891D8710036D100 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				FA2ECA8E28B2C540005A85B6 /* Authorization */,
 				FAD6FD6328A52E350038DC02 /* Services */,
 				FA755F342895A6E700327D32 /* Extensions */,
 				FA251726288F592E0036D100 /* Model */,
@@ -245,6 +248,14 @@
 				FA3792F428958EB50099B1A8 /* ToDo */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		FA2ECA8E28B2C540005A85B6 /* Authorization */ = {
+			isa = PBXGroup;
+			children = (
+				FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */,
+			);
+			path = Authorization;
 			sourceTree = "<group>";
 		};
 		FA3792F028958E390099B1A8 /* ToDoItem */ = {
@@ -660,6 +671,7 @@
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FAD6FD6B28A530350038DC02 /* MockFileCacheService.swift in Sources */,
 				FA53B65B28AE817B0083B0E8 /* PostItemRequestModel.swift in Sources */,
+				FA2ECA9028B2C559005A85B6 /* YandexOauthController.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,

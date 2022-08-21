@@ -19,12 +19,25 @@ final class DefaultNetworkService: NetworkService {
 
     private static var revision: Int32 = 0
 
-    private var token: String = {
+    var yandexOauthToken: String?
+
+    private var token: String {
+        if let yaToken = yandexOauthToken {
+            return yaToken
+        }
+
         guard let token = ProcessInfo.processInfo.environment["yandex-api-token"] else {
             fatalError("invalid token")
         }
         return token
-    }()
+    }
+
+    private var oauthType: String {
+        if yandexOauthToken != nil {
+            return "OAuth"
+        }
+        return "Bearer"
+    }
 
     private let syncQueue = DispatchQueue(label: "queriesSyncQ", attributes: .concurrent)
 
@@ -310,7 +323,7 @@ final class DefaultNetworkService: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = httpMethodType.rawValue
         request.allHTTPHeaderFields = [
-            "Authorization": "Bearer \(token)"
+            "Authorization": "\(oauthType) \(token)"
         ]
         return request
     }
@@ -319,7 +332,7 @@ final class DefaultNetworkService: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = httpMethodType.rawValue
         request.allHTTPHeaderFields = [
-            "Authorization": "Bearer \(token)",
+            "Authorization": "\(oauthType) \(token)",
             "X-Last-Known-Revision": "\(DefaultNetworkService.revision)"
         ]
         return request

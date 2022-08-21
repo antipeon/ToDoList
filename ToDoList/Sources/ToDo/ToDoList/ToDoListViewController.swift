@@ -7,6 +7,7 @@
 
 import UIKit
 import CocoaLumberjack
+import WebKit
 
 protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
@@ -14,7 +15,7 @@ protocol ToDoListModule: ToDoItemModule {
 }
 
 final class ToDoListViewController: UIViewController, ToDoListModule,
-                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
+                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate, TokenChangerDelegate {
 
     // MARK: - init
     init(model: ToDoListModel, observer: NetworkServiceObserver) {
@@ -46,6 +47,8 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     private let networkServiceObserver: NetworkServiceObserver
 
     private let network: NetworkService
+
+    private lazy var oauthController = YandexOauthController()
 
     private var showOnlyNotDone = true {
         didSet {
@@ -109,6 +112,9 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
+
+        oauthController.delegate = self
+        present(oauthController, animated: true, completion: nil)
     }
 
     override var navigationItem: UINavigationItem {
@@ -334,6 +340,17 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     func didNetworkWorkFinish() {
         networkSpinner.stopAnimating()
+    }
+
+    // MARK: - TokenChangerDelegate
+    func didReceiveYandexOauthToken(token: String?) {
+        guard let service = network as? DefaultNetworkService else {
+            return
+        }
+
+        service.yandexOauthToken = token
+
+        oauthController.dismiss(animated: true)
     }
 
     // MARK: - Private funcs
