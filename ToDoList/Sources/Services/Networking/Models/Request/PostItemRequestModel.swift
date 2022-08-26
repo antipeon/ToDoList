@@ -10,7 +10,7 @@ import Foundation
 struct PostItemRequestModel: Encodable {
     private let element: ToDoItemNetworkModel
 
-    init(from item: ToDoItem) {
+    init(from item: ToDoItemModel) {
         element = ToDoItemNetworkModel(from: item)
     }
 }

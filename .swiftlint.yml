@@ -6,8 +6,8 @@ type_body_length:
   - 300 # warning
   - 400 # error
 file_length:
-  - 450
-  - 500
+  - 600
+  - 700
 nesting:
   type_level:
     warning: 3
@@ -17,3 +17,5 @@ nesting:
     error: 10
 line_length:
   - 170
+cyclomatic_complexity:
+  ignores_case_statements: true

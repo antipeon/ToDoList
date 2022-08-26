@@ -8,12 +8,12 @@
 import Foundation
 
 final class FileCache {
-    private(set) var toDoItems = [ToDoItem]()
+    private(set) var toDoItems = [ToDoItemModel]()
 
     /// Adds item to collection if not present
     /// - Parameter item: Item to add
     /// - Returns: true if successfully added; false otherwise
-    @discardableResult func add(_ item: ToDoItem) -> Bool {
+    @discardableResult func add(_ item: ToDoItemModel) -> Bool {
         if toDoItems.index(matching: item) != nil {
             return false
         }
@@ -24,7 +24,7 @@ final class FileCache {
     /// Removes item from collection if present
     /// - Parameter item: Item to remove
     /// - Returns: Removed item; nil otherwise
-    @discardableResult func remove(_ item: ToDoItem) -> ToDoItem? {
+    @discardableResult func remove(_ item: ToDoItemModel) -> ToDoItemModel? {
         guard let index = toDoItems.index(matching: item) else {
             return nil
         }
@@ -60,9 +60,9 @@ final class FileCache {
             throw FileCacheError.jsonDecode
         }
 
-        let toDoItems: [ToDoItem] = try dictionaries
+        let toDoItems: [ToDoItemModel] = try dictionaries
             .reduce(into: [], { toDoItems, dictionary in
-                guard let item = ToDoItem.parse(json: dictionary) else {
+                guard let item = ToDoItemModel.parse(json: dictionary) else {
                     throw FileCacheError.jsonDecode
                 }
 

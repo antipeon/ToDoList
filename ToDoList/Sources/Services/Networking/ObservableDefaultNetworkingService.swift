@@ -21,23 +21,23 @@ class ObservableDefaultNetworkingService: NetworkService {
     }
 
     // MARK: - API
-    func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        doWithNotification(work: getAllToDoItems, completion: completion)
+    func getAllToDoItems(completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
+        doWithNotification(work: networkService.getAllToDoItems, completion: completion)
     }
 
-    func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func editToDoItem(_ item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         doWithNotification(work: networkService.editToDoItem, completion: completion, item)
     }
 
-    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         doWithNotification(work: networkService.deleteToDoItem, completion: completion, id)
     }
 
-    func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+    func updateToDoItems(withItems items: [ToDoItemModel], completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
         doWithNotification(work: networkService.updateToDoItems, completion: completion, items)
     }
 
-    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func addToDoItem(item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         doWithNotification(work: networkService.addToDoItem, completion: completion, item)
     }
 

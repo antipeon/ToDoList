@@ -9,7 +9,7 @@ import UIKit
 
 final class ToDoListView: UITableView {
 
-    typealias Module = ToDoListModule & UITableViewDelegate & UITableViewDataSource
+    typealias Module = UITableViewDelegate & UITableViewDataSource
 
     private weak var module: Module!
 
@@ -25,10 +25,6 @@ final class ToDoListView: UITableView {
     }
 
     // MARK: - Private funcs
-    private var doneItemsCount: Int {
-        module.doneItemsCount
-    }
-
     private func setUp() {
         backgroundColor = AppConstants.Colors.backPrimary
         setUpTableView()

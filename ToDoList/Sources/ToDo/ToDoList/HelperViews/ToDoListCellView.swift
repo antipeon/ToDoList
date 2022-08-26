@@ -121,7 +121,12 @@ final class Cell: UITableViewCell {
             text.text = item.text
             return
         }
-        let attrString = NSMutableAttributedString(string: item.text)
+
+        guard let itemText = item.text else {
+            return
+        }
+
+        let attrString = NSMutableAttributedString(string: itemText)
         attrString.addAttribute(
             NSAttributedString.Key.strikethroughStyle,
             value: 2,
@@ -140,7 +145,7 @@ final class Cell: UITableViewCell {
         }
     }
 
-    private func setPriority(with priority: ToDoItem.Priority) {
+    private func setPriority(with priority: ToDoItemModel.Priority) {
         switch priority {
         case .normal:
             priorityIcon.isHidden = true

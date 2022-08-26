@@ -12,7 +12,7 @@ final class MockNetworkService: NetworkService {
     private let queriesQueue = DispatchQueue(label: "queriesQ", attributes: .concurrent)
 
     // MARK: API
-    func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+    func getAllToDoItems(completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout()) { [weak self] in
             guard let self = self else {
                 return
@@ -36,7 +36,7 @@ final class MockNetworkService: NetworkService {
         }
     }
 
-    func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func editToDoItem(_ item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
@@ -60,7 +60,7 @@ final class MockNetworkService: NetworkService {
         }
     }
 
-    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
@@ -84,7 +84,7 @@ final class MockNetworkService: NetworkService {
         }
     }
 
-    func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+    func updateToDoItems(withItems items: [ToDoItemModel], completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
@@ -108,7 +108,7 @@ final class MockNetworkService: NetworkService {
         }
     }
 
-    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
+    func addToDoItem(item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
         queriesQueue.asyncAfter(deadline: .now() + timeout(), flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
@@ -141,11 +141,11 @@ final class MockNetworkService: NetworkService {
         return 0
     }
 
-    private func jsonToItems(json: Any) -> [ToDoItem]? {
+    private func jsonToItems(json: Any) -> [ToDoItemModel]? {
         Constants.MockData.items
     }
 
-    private func jsonToItem(json: Any) -> ToDoItem? {
+    private func jsonToItem(json: Any) -> ToDoItemModel? {
         Constants.MockData.items.first
     }
 
@@ -161,8 +161,8 @@ final class MockNetworkService: NetworkService {
 
         enum MockData {
             static let items = [
-                ToDoItem(text: "homework", priority: .high, createdAt: .now, modifiedAt: .now),
-                ToDoItem(text: "chill", priority: .low, createdAt: .now)
+                ToDoItemModel(text: "homework", priority: .high, createdAt: .now, modifiedAt: .now),
+                ToDoItemModel(text: "chill", priority: .low, createdAt: .now)
             ]
         }
     }

@@ -19,7 +19,7 @@ struct ToDoItemNetworkModel: Codable {
     let modifiedAt: Timestamp?
     let lastUpdatedBy: String = ""
 
-    init(from item: ToDoItem) {
+    init(from item: ToDoItemModel) {
         id = item.id
         text = item.text
         priority = .init(from: item.priority)
@@ -49,11 +49,11 @@ struct ToDoItemNetworkModel: Codable {
 
 // MARK: - Extensions
 
-extension ToDoItem.Priority: Codable {
+extension ToDoItemModel.Priority: Codable {
 
 }
 
-extension ToDoItem.Priority {
+extension ToDoItemModel.Priority {
     init(from networkingModelPriority: ToDoItemNetworkModel.Priority) {
         switch networkingModelPriority {
         case .low:
@@ -67,7 +67,7 @@ extension ToDoItem.Priority {
 }
 
 extension ToDoItemNetworkModel.Priority {
-    init(from toDoItemPriority: ToDoItem.Priority) {
+    init(from toDoItemPriority: ToDoItemModel.Priority) {
         switch toDoItemPriority {
         case .low:
             self = .low
@@ -79,7 +79,7 @@ extension ToDoItemNetworkModel.Priority {
     }
 }
 
-extension ToDoItem {
+extension ToDoItemModel {
     init(from networkingModel: ToDoItemNetworkModel) {
 
         self.init(

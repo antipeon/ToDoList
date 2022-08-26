@@ -1,5 +1,5 @@
 //
-//  ToDoListModel.swift
+//  ToDoListService.swift
 //  ToDoList
 //
 //  Created by Samat Gaynutdinov on 06.08.2022.
@@ -7,8 +7,9 @@
 
 import Foundation
 import CocoaLumberjack
+import CoreData
 
-protocol ToDoListModelDelegate: AnyObject {
+protocol ToDoListServiceDelegate: AnyObject {
     func didAddItem()
     func didDeleteItem()
     func didSave()
@@ -20,14 +21,12 @@ protocol ToDoListModelDelegate: AnyObject {
     func didSynchronize()
 }
 
-final class ToDoListModel {
+final class ToDoListService {
 
     // MARK: - Private vars
-    private static let fileName = "toDoItems"
-    private var fileCacheService: FileCacheService
     private var networkService: NetworkService
 
-    private lazy var retry: ExponentialRetry<[ToDoItem]> = {
+    private lazy var retry: ExponentialRetry<[ToDoItemModel]> = {
         ExponentialRetry(
             networkService: networkService,
             work: networkService.updateToDoItems,
@@ -45,29 +44,38 @@ final class ToDoListModel {
         )
     }()
 
+    private let coreDataStack = CoreDataStack.shared
+
     // MARK: - init
     init(networkService: NetworkService) {
-        fileCacheService = MockFileCacheService()
         self.networkService = networkService
     }
 
     // MARK: - API
-    var items: [ToDoItem] {
-        fileCacheService.toDoItems.orderedByDate()
-    }
-
-    var delegate: ToDoListModelDelegate?
+    var delegate: ToDoListServiceDelegate?
 
     func load() {
         assert(Thread.current.isMainThread)
 
-        fileCacheService.load(from: ToDoListModel.fileName) { [weak self] result in
-            assert(Thread.current.isMainThread)
-            self?.processLoadResult(result)
+        coreDataStack.container.performBackgroundTask { [self] context in
+            let fetchRequest = ToDoItem.fetchRequest()
+
+            do {
+                let items = try context.fetch(fetchRequest)
+                DispatchQueue.main.async {
+                    if items.isEmpty {
+                        self.processLoadResult(.failure(FileCacheServiceErrors.LoadError.failLoadNoSuchFile))
+                    } else {
+                        self.processLoadResult(.success(()))
+                    }
+                }
+            } catch {
+                fatalError("function \(#function) failed with error: \(error.localizedDescription)")
+            }
         }
     }
 
-    func addItem(_ item: ToDoItem?) {
+    func addItem(_ item: ToDoItemModel?, isNew: Bool) {
         assert(Thread.current.isMainThread)
 
         guard let item = item else {
@@ -76,23 +84,14 @@ final class ToDoListModel {
             return
         }
 
-        // local work
-        let deleteResult = fileCacheService.delete(id: item.id)
-        let addResult = fileCacheService.add(item)
-        processAddResult(addResult, for: item)
-
-        saveItemsToCache()
-
-        // server work
-        switch deleteResult {
-        case .success:
-            requestToEditItem(item)
-        case .failure:
+        if isNew {
             requestToAddItem(item)
+        } else {
+            requestToEditItem(item)
         }
     }
 
-    func deleteItem(_ item: ToDoItem?) {
+    func deleteItem(_ item: ToDoItemModel?) {
         assert(Thread.current.isMainThread)
 
         guard let item = item else {
@@ -101,27 +100,25 @@ final class ToDoListModel {
             return
         }
 
-        // local work
-        let result = fileCacheService.delete(id: item.id)
-        processDeleteResult(result, for: item)
-
-        saveItemsToCache()
-
-        // server work
         requestToDeleteItem(item)
     }
 
     // MARK: - Private funcs
-    private func saveItemsToCache() {
-        DDLogVerbose(Constants.SaveMessages.performing)
+    private var items: [ToDoItemModel] {
+        let fetchRequest = ToDoItem.fetchRequest()
 
-        fileCacheService.save(to: ToDoListModel.fileName) { [weak self] result in
-            assert(Thread.current.isMainThread)
-            self?.processSaveResult(result)
+        do {
+            return try CoreDataStack.shared.mainContext.fetch(fetchRequest)
+                .compactMap { item in
+                    item.toImmutable
+                }
+
+        } catch let error as NSError {
+            fatalError("coreDataStack unavailable: \(error.description)")
         }
     }
 
-    private func requestToAddItem(_ item: ToDoItem) {
+    private func requestToAddItem(_ item: ToDoItemModel) {
         networkService.addToDoItem(item: item) { [weak self] result in
             guard let self = self else {
                 return
@@ -132,7 +129,7 @@ final class ToDoListModel {
         }
     }
 
-    private func requestToEditItem(_ item: ToDoItem) {
+    private func requestToEditItem(_ item: ToDoItemModel) {
         networkService.editToDoItem(item) { [weak self] result in
             guard let self = self else {
                 return
@@ -143,7 +140,7 @@ final class ToDoListModel {
         }
     }
 
-    private func requestToDeleteItem(_ item: ToDoItem) {
+    private func requestToDeleteItem(_ item: ToDoItemModel) {
         self.networkService.deleteToDoItem(at: item.id) { [weak self] result in
             guard let self = self else {
                 return
@@ -151,17 +148,6 @@ final class ToDoListModel {
 
             self.logDeleteItemOnServer(result)
             self.synchronizeIfNeeded(result)
-        }
-    }
-
-    private func processSaveResult(_ result: Result<Void, Error>) {
-        switch result {
-        case .failure(let error):
-            DDLogError("\(Constants.SaveMessages.unsuccessful) - error: \(error.localizedDescription)")
-            delegate?.didSaveFail()
-        case .success:
-            DDLogInfo(Constants.SaveMessages.successful)
-            delegate?.didSave()
         }
     }
 
@@ -181,8 +167,6 @@ final class ToDoListModel {
 
                 synchronizeWithServerIfNoFileInCache()
                 delegate?.didLoad()
-
-                self.delegate?.didLoad()
 
             case .failLoad:
                 DDLogError("\(Constants.LoadMessages.fail): \(error.localizedDescription)")
@@ -216,6 +200,7 @@ final class ToDoListModel {
     private func synchronizeWithServerIfNoFileInCache() {
         DDLogVerbose("fetching list from server...")
         networkService.getAllToDoItems { [weak self] result in
+            assert(Thread.isMainThread)
             guard let self = self else {
                 return
             }
@@ -241,35 +226,47 @@ final class ToDoListModel {
         }
     }
 
-    private func processDeleteResult(_ result: Result<ToDoItem, Error>, for item: ToDoItem) {
-        switch result {
-        case .failure(let error):
-            DDLogError("\(Constants.DeleteMessages.fail): with id: \(item.id), with error \(error.localizedDescription)")
-            delegate?.didDeleteItemFail()
-        case .success(let item):
-            DDLogInfo("\(Constants.DeleteMessages.sucessful): \(item)")
-            delegate?.didDeleteItem()
+    private func replaceItemsWithNewItems(_ items: [ToDoItemModel]) {
+        coreDataStack.container.performBackgroundTask { [self] context in
+            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            do {
+                let fetchRequest = ToDoItem.fetchRequest()
+                let items = try context.fetch(fetchRequest)
+
+                // delete all
+                for item in items {
+                    context.delete(item)
+                }
+
+            } catch let errror as NSError {
+                fatalError("error in \(#function): \(errror.description)")
+            }
+
+            // add new
+            for itemModel in items {
+                guard let entity =
+                    NSEntityDescription.entity(forEntityName: "ToDoItem",
+                                               in: context) else {
+                    fatalError("couldn't create entity")
+                }
+
+                let item = ToDoItem(entity: entity, insertInto: context)
+                item.setPropertiesFrom(model: itemModel)
+            }
+
+            do {
+                try context.save()
+            } catch let error as NSError {
+                fatalError("error in \(#function): \(error.description)")
+            }
+
+            DispatchQueue.main.async {
+                self.delegate?.didSynchronize()
+            }
         }
     }
 
-    private func processAddResult(_ result: Result<Void, Error>, for item: ToDoItem) {
-        switch result {
-        case .failure(let error):
-            DDLogError("\(Constants.AddMessages.fail): \(String(describing: item)) with error \(error.localizedDescription)")
-            delegate?.didAddItemFail()
-        case .success:
-            DDLogInfo("\(Constants.AddMessages.sucessful): \(item)")
-            delegate?.didAddItem()
-        }
-    }
-
-    private func replaceItemsWithNewItems(_ items: [ToDoItem]) {
-        fileCacheService.replaceItemsWithNewItems(items)
-        delegate?.didSynchronize()
-        saveItemsToCache()
-    }
-
-    private func logEditItemOnServer(_ result: Result<ToDoItem, Error>) {
+    private func logEditItemOnServer(_ result: Result<ToDoItemModel, Error>) {
         switch result {
         case .success:
             DDLogVerbose(Constants.ServerEditMessages.sucessful)
@@ -278,7 +275,7 @@ final class ToDoListModel {
         }
     }
 
-    private func logAddItemOnServer(_ result: Result<ToDoItem, Error>) {
+    private func logAddItemOnServer(_ result: Result<ToDoItemModel, Error>) {
         switch result {
         case .success:
             DDLogVerbose(Constants.ServerAddMessages.sucessful)
@@ -287,7 +284,7 @@ final class ToDoListModel {
         }
     }
 
-    private func logDeleteItemOnServer(_ result: Result<ToDoItem, Error>) {
+    private func logDeleteItemOnServer(_ result: Result<ToDoItemModel, Error>) {
         switch result {
         case .success:
             DDLogVerbose(Constants.ServerDeleteMessages.sucessful)
@@ -335,15 +332,14 @@ final class ToDoListModel {
     }
 }
 
-// MARK: - Extensions
-extension FileCacheService {
-    func replaceItemsWithNewItems(_ items: [ToDoItem]) {
-        for item in self.toDoItems {
-            delete(id: item.id)
-        }
-
-        for item in items {
-            add(item)
-        }
+extension ToDoItem {
+    func setPropertiesFrom(model: ToDoItemModel) {
+        self.id = model.id
+        self.text = model.text
+        self.done = model.done
+        self.priority = model.priority
+        self.deadline = model.deadline
+        self.createdAt = model.createdAt
+        self.modifiiedAt = model.modifiedAt
     }
 }
