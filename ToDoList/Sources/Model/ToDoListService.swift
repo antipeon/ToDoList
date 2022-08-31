@@ -8,7 +8,7 @@
 import Foundation
 import CocoaLumberjack
 
-protocol ToDoListModelDelegate: AnyObject {
+protocol ToDoListServiceDelegate: AnyObject {
     func didAddItem()
     func didDeleteItem()
     func didSave()
@@ -20,7 +20,7 @@ protocol ToDoListModelDelegate: AnyObject {
     func didSynchronize()
 }
 
-final class ToDoListModel {
+final class ToDoListService {
 
     // MARK: - Private vars
     private static let fileName = "toDoItems"
@@ -61,7 +61,7 @@ final class ToDoListModel {
     func load() {
         assert(Thread.current.isMainThread)
 
-        fileCacheService.load(from: ToDoListModel.fileName) { [weak self] result in
+        fileCacheService.load(from: ToDoListService.fileName) { [weak self] result in
             assert(Thread.current.isMainThread)
             self?.processLoadResult(result)
         }
@@ -115,7 +115,7 @@ final class ToDoListModel {
     private func saveItemsToCache() {
         DDLogVerbose(Constants.SaveMessages.performing)
 
-        fileCacheService.save(to: ToDoListModel.fileName) { [weak self] result in
+        fileCacheService.save(to: ToDoListService.fileName) { [weak self] result in
             assert(Thread.current.isMainThread)
             self?.processSaveResult(result)
         }

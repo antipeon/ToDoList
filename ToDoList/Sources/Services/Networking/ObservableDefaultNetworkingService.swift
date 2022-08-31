@@ -22,7 +22,7 @@ class ObservableDefaultNetworkingService: NetworkService {
 
     // MARK: - API
     func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        doWithNotification(work: getAllToDoItems, completion: completion)
+        doWithNotification(work: networkService.getAllToDoItems, completion: completion)
     }
 
     func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {

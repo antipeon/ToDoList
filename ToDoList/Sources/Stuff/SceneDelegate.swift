@@ -29,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let observer = NetworkingServiceObserverImpl()
         networkService.observer = observer
 
-        let toDoListViewController = ToDoListViewController(model: ToDoListModel(networkService: networkService), observer: observer)
+        let toDoListViewController = ToDoListViewController(model: ToDoListService(networkService: networkService), observer: observer)
         navigationViewController.viewControllers = [toDoListViewController]
         toDoListViewController.navigationController?.navigationBar.prefersLargeTitles = true
         window.rootViewController = navigationViewController

@@ -19,7 +19,7 @@ final class DefaultNetworkService: NetworkService {
 
     private static var revision: Int32 = 0
 
-    var yandexOauthToken: String?
+    private var yandexOauthToken: String?
 
     private var token: String {
         if let yaToken = yandexOauthToken {
@@ -39,11 +39,16 @@ final class DefaultNetworkService: NetworkService {
         return "Bearer"
     }
 
-    private let syncQueue = DispatchQueue(label: "queriesSyncQ", attributes: .concurrent)
+    private let networkQueue = DispatchQueue(label: "queriesSyncQ", attributes: .concurrent)
+
+    // MARK: - init
+    init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(setYandexOauthToken(_:)), name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName), object: nil)
+    }
 
     // MARK: - API
     func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        syncQueue.async { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -95,7 +100,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -151,7 +156,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -203,7 +208,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -259,7 +264,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -390,6 +395,10 @@ final class DefaultNetworkService: NetworkService {
         default:
             return ServerError.unknownError(code: code)
         }
+    }
+
+    @objc private func setYandexOauthToken(_ notification: NSNotification) {
+        yandexOauthToken = notification.userInfo?[YandexOauthController.Constants.tokenKey] as? String
     }
 
     // MARK: - Constants

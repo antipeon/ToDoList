@@ -15,10 +15,10 @@ protocol ToDoListModule: ToDoItemModule {
 }
 
 final class ToDoListViewController: UIViewController, ToDoListModule,
-                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate, TokenChangerDelegate {
+                                    ToDoListServiceDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
 
     // MARK: - init
-    init(model: ToDoListModel, observer: NetworkServiceObserver) {
+    init(model: ToDoListService, observer: NetworkServiceObserver) {
         self.model = model
         self.network = DefaultNetworkService()
         self.networkServiceObserver = observer
@@ -26,6 +26,13 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
         model.delegate = self
         networkServiceObserver.delegate = self
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didReceiveYandexOauthToken(_:)),
+            name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName),
+            object: nil
+        )
     }
 
     required init?(coder: NSCoder) {
@@ -42,7 +49,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private lazy var toDoListView = ToDoListView(module: self)
 
-    private let model: ToDoListModel
+    private let model: ToDoListService
 
     private let networkServiceObserver: NetworkServiceObserver
 
@@ -113,7 +120,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
 
-        oauthController.delegate = self
         present(oauthController, animated: true, completion: nil)
     }
 
@@ -342,17 +348,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         networkSpinner.stopAnimating()
     }
 
-    // MARK: - TokenChangerDelegate
-    func didReceiveYandexOauthToken(token: String?) {
-        guard let service = network as? DefaultNetworkService else {
-            return
-        }
-
-        service.yandexOauthToken = token
-
-        oauthController.dismiss(animated: true)
-    }
-
     // MARK: - Private funcs
     private func updateViews() {
         rootView.reloadData()
@@ -394,6 +389,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private func setUpNetworkSpinner() {
         networkSpinner.hidesWhenStopped = true
+    }
+
+    @objc private func didReceiveYandexOauthToken(_ notification: NSNotification) {
+        oauthController.dismiss(animated: true)
     }
 
     private enum Constants {
