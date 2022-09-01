@@ -21,6 +21,7 @@ final class YandexOauthController: UIViewController, WKUIDelegate, WKNavigationD
     }
 
     override func loadView() {
+        super.loadView()
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
@@ -93,6 +94,7 @@ final class YandexOauthController: UIViewController, WKUIDelegate, WKNavigationD
             name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName),
             object: nil,
             userInfo: dict)
+        navigationController?.popViewController(animated: true)
     }
 
     // MARK: - Constants

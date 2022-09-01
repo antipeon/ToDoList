@@ -20,19 +20,11 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     // MARK: - init
     init(model: ToDoListService, observer: NetworkServiceObserver) {
         self.model = model
-        self.network = DefaultNetworkService()
         self.networkServiceObserver = observer
         super.init(nibName: nil, bundle: nil)
 
         model.delegate = self
         networkServiceObserver.delegate = self
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(didReceiveYandexOauthToken(_:)),
-            name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName),
-            object: nil
-        )
     }
 
     required init?(coder: NSCoder) {
@@ -52,10 +44,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
     private let model: ToDoListService
 
     private let networkServiceObserver: NetworkServiceObserver
-
-    private let network: NetworkService
-
-    private lazy var oauthController = YandexOauthController()
 
     private var showOnlyNotDone = true {
         didSet {
@@ -102,13 +90,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return view
     }()
 
-    private var networkItems: [ToDoItem]!
-
     // MARK: - UIViewController
     override func loadView() {
         super.loadView()
         view = toDoListView
-        model.load()
     }
 
     override func viewDidLoad() {
@@ -120,7 +105,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
 
-        present(oauthController, animated: true, completion: nil)
+        model.load()
     }
 
     override var navigationItem: UINavigationItem {
@@ -389,10 +374,6 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private func setUpNetworkSpinner() {
         networkSpinner.hidesWhenStopped = true
-    }
-
-    @objc private func didReceiveYandexOauthToken(_ notification: NSNotification) {
-        oauthController.dismiss(animated: true)
     }
 
     private enum Constants {

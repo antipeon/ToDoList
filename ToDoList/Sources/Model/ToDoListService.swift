@@ -56,7 +56,7 @@ final class ToDoListService {
         fileCacheService.toDoItems.orderedByDate()
     }
 
-    var delegate: ToDoListModelDelegate?
+    var delegate: ToDoListServiceDelegate?
 
     func load() {
         assert(Thread.current.isMainThread)
