@@ -8,15 +8,9 @@
 import Foundation
 import WebKit
 
-protocol TokenChangerDelegate: AnyObject {
-    func didReceiveYandexOauthToken(token: String?)
-}
-
 final class YandexOauthController: UIViewController, WKUIDelegate, WKNavigationDelegate {
 
     private var webView: WKWebView!
-
-    weak var delegate: TokenChangerDelegate?
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -27,21 +21,34 @@ final class YandexOauthController: UIViewController, WKUIDelegate, WKNavigationD
     }
 
     override func loadView() {
+        super.loadView()
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         webView.uiDelegate = self
         webView.navigationDelegate = self
         view = webView
     }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let urlString = "https://oauth.yandex.ru/authorize?response_type=token&client_id=0d0970774e284fa8ba9ff70b6b06479a"
+        var components = URLComponents()
 
-        let myURL = URL(string: urlString)!
-        let myRequest = URLRequest(url: myURL)
+        components.scheme = "https"
+        components.host = "oauth.yandex.ru"
+        components.path = "/authorize"
+        components.queryItems = [
+            URLQueryItem(name: "response_type", value: "token"),
+            URLQueryItem(name: "client_id", value: "0d0970774e284fa8ba9ff70b6b06479a")
+        ]
+
+        guard let url = components.url else {
+            postNotification(with: nil)
+            return
+        }
+
+        let myRequest = URLRequest(url: url)
         webView.load(myRequest)
-
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -49,30 +56,50 @@ final class YandexOauthController: UIViewController, WKUIDelegate, WKNavigationD
 
         if let url = webView.url, url.absoluteString.starts(with: "https://oauth.yandex.ru/verification_code") {
             guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-                delegate?.didReceiveYandexOauthToken(token: nil)
+                postNotification(with: nil)
                 return
             }
 
             urlComponents.query = urlComponents.fragment
 
             guard let queryItems = urlComponents.queryItems else {
-                delegate?.didReceiveYandexOauthToken(token: nil)
+                postNotification(with: nil)
                 return
             }
 
             guard let itemWithAccessToken = queryItems.first(where: { queryItem in
                 return queryItem.name == "access_token"
             }) else {
-                delegate?.didReceiveYandexOauthToken(token: nil)
+                postNotification(with: nil)
                 return
             }
 
             guard let value = itemWithAccessToken.value else {
-                delegate?.didReceiveYandexOauthToken(token: nil)
+                postNotification(with: nil)
                 return
             }
 
-            delegate?.didReceiveYandexOauthToken(token: value)
+            postNotification(with: value)
         }
+    }
+
+    // MARK: - Private funcs
+    private func postNotification(with oauthToken: String?) {
+        var dict = [String: String]()
+        if let oauthToken = oauthToken {
+            dict[Constants.tokenKey] = oauthToken
+        }
+
+        NotificationCenter.default.post(
+            name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName),
+            object: nil,
+            userInfo: dict)
+        navigationController?.popViewController(animated: true)
+    }
+
+    // MARK: - Constants
+    enum Constants {
+        static let useOauthNotificationName = "useOauth"
+        static let tokenKey = "token"
     }
 }

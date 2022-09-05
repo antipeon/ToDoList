@@ -16,7 +16,6 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
     // MARK: - init
     init(model: ToDoListService, observer: NetworkServiceObserver) {
         self.model = model
-        self.network = DefaultNetworkService()
         self.networkServiceObserver = observer
 
         super.init(nibName: nil, bundle: nil)
@@ -54,10 +53,6 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
 
     private let networkServiceObserver: NetworkServiceObserver
 
-    private let network: NetworkService
-
-    private lazy var oauthController = YandexOauthController()
-
     private var showOnlyNotDone = true {
         didSet {
             baseFetchRequest.predicate = (baseFetchRequest.predicate == nil ? notDoneItemsPredicate : nil)
@@ -86,8 +81,6 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
         return view
     }()
 
-    private var networkItems: [ToDoItemModel]!
-
     // MARK: - UIViewController
     override func loadView() {
         super.loadView()
@@ -109,8 +102,7 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
 
-        oauthController.delegate = self
-        present(oauthController, animated: true, completion: nil)
+        model.load()
     }
 
     override var navigationItem: UINavigationItem {
@@ -339,17 +331,6 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
 
     func didNetworkWorkFinish() {
         networkSpinner.stopAnimating()
-    }
-
-    // MARK: - TokenChangerDelegate
-    func didReceiveYandexOauthToken(token: String?) {
-        guard let service = network as? DefaultNetworkService else {
-            return
-        }
-
-        service.yandexOauthToken = token
-
-        oauthController.dismiss(animated: true)
     }
 
     // MARK: - Private funcs
