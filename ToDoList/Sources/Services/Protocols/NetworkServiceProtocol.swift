@@ -8,15 +8,15 @@
 import Foundation
 
 protocol NetworkService {
-    func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void)
+    func getAllToDoItems(completion: @escaping (Result<[ToDoItemModel], Error>) -> Void)
 
-    func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void)
+    func editToDoItem(_ item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void)
 
-    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void)
+    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItemModel, Error>) -> Void)
 
-    func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void)
+    func updateToDoItems(withItems items: [ToDoItemModel], completion: @escaping (Result<[ToDoItemModel], Error>) -> Void)
 
-    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void)
+    func addToDoItem(item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void)
 }
 
 enum NetworkServiceError: Error {

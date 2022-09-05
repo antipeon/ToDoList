@@ -10,7 +10,7 @@ import Foundation
 struct PatchItemsRequestModel: Encodable {
     private let list: [ToDoItemNetworkModel]
 
-    init(with items: [ToDoItem]) {
+    init(with items: [ToDoItemModel]) {
         list = items.map {
             ToDoItemNetworkModel(from: $0)
         }

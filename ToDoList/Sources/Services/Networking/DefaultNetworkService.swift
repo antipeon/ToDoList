@@ -47,7 +47,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     // MARK: - API
-    func getAllToDoItems(completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
+    func getAllToDoItems(completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
         networkQueue.async { [weak self] in
             guard let self = self else {
                 return
@@ -86,7 +86,7 @@ final class DefaultNetworkService: NetworkService {
                     return
                 }
 
-                let items = model.list.map { ToDoItem(from: $0) }
+                let items = model.list.map { ToDoItemModel(from: $0) }
 
                 DefaultNetworkService.revision = model.revision
 
@@ -99,8 +99,8 @@ final class DefaultNetworkService: NetworkService {
         }
     }
 
-    func editToDoItem(_ item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        networkQueue.async { [weak self] in
+    func editToDoItem(_ item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -141,7 +141,7 @@ final class DefaultNetworkService: NetworkService {
                     return
                 }
 
-                let item = ToDoItem(from: model.element)
+                let item = ToDoItemModel(from: model.element)
 
                 DefaultNetworkService.revision = model.revision
 
@@ -155,8 +155,8 @@ final class DefaultNetworkService: NetworkService {
 
     }
 
-    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        networkQueue.async { [weak self] in
+    func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -194,7 +194,7 @@ final class DefaultNetworkService: NetworkService {
                     return
                 }
 
-                let item = ToDoItem(from: model.element)
+                let item = ToDoItemModel(from: model.element)
 
                 DefaultNetworkService.revision = model.revision
 
@@ -207,8 +207,8 @@ final class DefaultNetworkService: NetworkService {
         }
     }
 
-    func updateToDoItems(withItems items: [ToDoItem], completion: @escaping (Result<[ToDoItem], Error>) -> Void) {
-        networkQueue.async { [weak self] in
+    func updateToDoItems(withItems items: [ToDoItemModel], completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -249,7 +249,7 @@ final class DefaultNetworkService: NetworkService {
                     return
                 }
 
-                let items = model.list.map { ToDoItem(from: $0) }
+                let items = model.list.map { ToDoItemModel(from: $0) }
 
                 DefaultNetworkService.revision = model.revision
 
@@ -263,8 +263,8 @@ final class DefaultNetworkService: NetworkService {
 
     }
 
-    func addToDoItem(item: ToDoItem, completion: @escaping (Result<ToDoItem, Error>) -> Void) {
-        networkQueue.async { [weak self] in
+    func addToDoItem(item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -305,7 +305,7 @@ final class DefaultNetworkService: NetworkService {
                     return
                 }
 
-                let item = ToDoItem(from: model.element)
+                let item = ToDoItemModel(from: model.element)
 
                 DefaultNetworkService.revision = model.revision
 

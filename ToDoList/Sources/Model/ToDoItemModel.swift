@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ToDoItem: Identifiable {
+struct ToDoItemModel: Identifiable {
     private enum Constants {
         static let idKey = "id"
         static let textKey = "text"
@@ -52,23 +52,23 @@ struct ToDoItem: Identifiable {
     }
 }
 
-extension ToDoItem: Equatable {
-    static func == (lhs: ToDoItem, rhs: ToDoItem) -> Bool {
+extension ToDoItemModel: Equatable {
+    static func == (lhs: ToDoItemModel, rhs: ToDoItemModel) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-extension ToDoItem: Hashable {
+extension ToDoItemModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 }
 
-extension ToDoItem {
+extension ToDoItemModel {
     /// Parses json to toDoItem
     /// - Parameter json: [String: Any]
     /// - Returns: ToDoItem if can convert
-    static func parse(json: Any) -> ToDoItem? {
+    static func parse(json: Any) -> ToDoItemModel? {
 
         guard let dictionary = json as? [String: Any] else {
             return nil
@@ -93,7 +93,7 @@ extension ToDoItem {
         let deadline = (dictionary[Constants.deadlineKey] as? Int)?.date
         let modifiedAt = (dictionary[Constants.modifiedAtKey] as? Int)?.date
 
-        return ToDoItem(
+        return ToDoItemModel(
             id: id,
             text: text,
             priority: priority,

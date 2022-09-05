@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ToDoItem" representedClassName="ToDoItem" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="deadline" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="done" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="modifiiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="priorityValue" optional="YES" attributeType="String"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <relationship name="toDoList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ToDoList" inverseName="items" inverseEntity="ToDoList"/>
+    </entity>
+    <entity name="ToDoList" representedClassName="ToDoList" syncable="YES">
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="ToDoItem" inverseName="toDoList" inverseEntity="ToDoItem"/>
+    </entity>
+    <elements>
+        <element name="ToDoItem" positionX="-27" positionY="18" width="128" height="149"/>
+        <element name="ToDoList" positionX="18" positionY="117" width="128" height="44"/>
+    </elements>
+</model>

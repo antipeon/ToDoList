@@ -9,7 +9,7 @@ import UIKit
 
 final class ToDoItemView: UIView {
 
-    typealias Module = ToDoItemModule & UITextViewDelegate
+    typealias Module = ToDoItemViewController
 
     // MARK: - Views
     lazy var vStackView: UIStackView = {
@@ -86,13 +86,15 @@ final class ToDoItemView: UIView {
     // MARK: - Properties
 
     private var module: Module
-    private var item: ToDoItem?
+    private let item: ToDoItem?
+    private let isNewItem: Bool
 
     // MARK: - Init
 
-    init(module: Module, item: ToDoItem?) {
+    init(module: Module, item: ToDoItem?, isNewItem: Bool) {
         self.module = module
         self.item = item
+        self.isNewItem = isNewItem
         super.init(frame: .zero)
         setUp()
     }
@@ -103,13 +105,16 @@ final class ToDoItemView: UIView {
 
     // MARK: - Public Methods
     func cancel() {
-        module.dismiss()
+//        module.dismiss()
+        module.delegate?.didFinish(controller: module, didSave: false)
     }
 
     func save() throws {
         updateModel()
-        module.addItem(item)
-        module.dismiss()
+        module.addItem(item?.toImmutable, isNew: isNewItem)
+//        module.dismiss()
+
+        module.delegate?.didFinish(controller: module, didSave: true)
     }
 
     func setUpTextViewPlaceholder(_ textView: UITextView) {
@@ -294,9 +299,17 @@ final class ToDoItemView: UIView {
 
     // MARK: - Actions
     @objc private func deleteItem() throws {
+        guard let item = item else {
+            return
+        }
+
         updateModel()
-        module.deleteItem(item)
-        module.dismiss()
+        module.deleteItem(item.toImmutable)
+//        module.dismiss()
+
+        item.managedObjectContext?.delete(item)
+
+        module.delegate?.didFinish(controller: module, didSave: true)
     }
 
     @objc private func datePickerDateChanged() {
@@ -323,7 +336,7 @@ final class ToDoItemView: UIView {
 
     private func updateModel() {
         let index = switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex
-        guard let priority = ToDoItem.Priority.makePriorityFromSelectedSegmentIndex(index) else {
+        guard let priority = ToDoItemModel.Priority.makePriorityFromSelectedSegmentIndex(index) else {
             fatalError("no such priority")
         }
 
@@ -331,26 +344,41 @@ final class ToDoItemView: UIView {
 
         let now = Date.now
 
-        if let item = item {
-            self.item = ToDoItem(
-                id: item.id,
-                text: toDoText.text,
-                priority: priority,
-                createdAt: item.createdAt,
-                deadline: deadline,
-                done: item.done,
-                modifiedAt: now
-            )
+        guard let item = item else {
             return
         }
 
-        item = ToDoItem(
-            text: toDoText.text,
-            priority: priority,
-            createdAt: now,
-            deadline: deadline,
-            modifiedAt: now
-        )
+        item.text = toDoText.text
+        item.priority = priority
+        item.deadline = deadline
+        item.modifiiedAt = now
+
+        if isNewItem {
+            item.createdAt = now
+            item.done = false
+            item.id = UUID().uuidString
+        }
+
+//        if let item = item {
+//            self.item = ToDoItemModel(
+//                id: item.id,
+//                text: toDoText.text,
+//                priority: priority,
+//                createdAt: item.createdAt,
+//                deadline: deadline,
+//                done: item.done,
+//                modifiedAt: now
+//            )
+//            return
+//        }
+//
+//        item = ToDoItemModel(
+//            text: toDoText.text,
+//            priority: priority,
+//            createdAt: now,
+//            deadline: deadline,
+//            modifiedAt: now
+//        )
     }
 
     // MARK: - Constants
@@ -371,9 +399,9 @@ final class ToDoItemView: UIView {
     }
 }
 
-extension ToDoItem.Priority {
-    static func makePriorityFromSelectedSegmentIndex(_ index: Int) -> ToDoItem.Priority? {
-        let allCases = ToDoItem.Priority.allCases
+extension ToDoItemModel.Priority {
+    static func makePriorityFromSelectedSegmentIndex(_ index: Int) -> ToDoItemModel.Priority? {
+        let allCases = ToDoItemModel.Priority.allCases
         guard index < allCases.count else {
             return nil
         }

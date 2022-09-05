@@ -8,21 +8,17 @@
 import UIKit
 import CocoaLumberjack
 import WebKit
+import CoreData
 
-protocol ToDoListModule: ToDoItemModule {
-    var doneItemsCount: Int { get }
-    var notDoneItems: [ToDoItem] { get }
-}
-
-final class ToDoListViewController: UIViewController, ToDoListModule,
+final class ToDoListViewController: UIViewController, ToDoItemModule,
                                     ToDoListServiceDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
 
     // MARK: - init
     init(model: ToDoListService, observer: NetworkServiceObserver) {
         self.model = model
         self.networkServiceObserver = observer
-        super.init(nibName: nil, bundle: nil)
 
+        super.init(nibName: nil, bundle: nil)
         model.delegate = self
         networkServiceObserver.delegate = self
     }
@@ -39,6 +35,18 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return view
     }
 
+    private let coreDataStack = CoreDataStack.shared
+
+    private lazy var fetchedItemsController: NSFetchedResultsController<ToDoItem> = {
+        let fetchRequest = baseFetchRequest
+        let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: coreDataStack.mainContext, sectionNameKeyPath: nil, cacheName: nil)
+        return controller
+    }()
+
+    private lazy var notDoneItemsPredicate: NSPredicate = {
+        NSPredicate(format: "%K = %@", argumentArray: [#keyPath(ToDoItem.done), false])
+    }()
+
     private lazy var toDoListView = ToDoListView(module: self)
 
     private let model: ToDoListService
@@ -47,26 +55,9 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private var showOnlyNotDone = true {
         didSet {
-            // indexpath to insert
-            let indexes = model.items
-                .indices
-                .filter {
-                    model.items[$0].done
-                }
-                .map {
-                    IndexPath(row: $0, section: 0)
-                }
-
-            if showOnlyNotDone {
-                rootView.deleteRows(at: indexes, with: .fade)
-            } else {
-                rootView.insertRows(at: indexes, with: .fade)
-            }
+            baseFetchRequest.predicate = (baseFetchRequest.predicate == nil ? notDoneItemsPredicate : nil)
+            performFetch()
         }
-    }
-
-    private var displayedItems: [ToDoItem] {
-        (showOnlyNotDone ? notDoneItems : model.items)
     }
 
     private var swipedRow: IndexPath?
@@ -98,6 +89,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        fetchedItemsController.delegate = self
+        performFetch()
+
         setUpAddNewItemButton()
         setUpSpinner()
         setUpNetworkSpinner()
@@ -114,27 +109,11 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return item
     }
 
-    // MARK: - ToDoListModule
-    var doneItemsCount: Int {
-        model.items
-            .filter {
-                $0.done
-            }
-            .count
+    func addItem(_ item: ToDoItemModel?, isNew: Bool) {
+        model.addItem(item, isNew: isNew)
     }
 
-    var notDoneItems: [ToDoItem] {
-        model.items
-            .filter {
-                !$0.done
-            }
-    }
-
-    func addItem(_ item: ToDoItem?) {
-        model.addItem(item)
-    }
-
-    func deleteItem(_ item: ToDoItem?) {
+    func deleteItem(_ item: ToDoItemModel?) {
         model.deleteItem(item)
     }
 
@@ -190,7 +169,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             return
         }
 
-        let item = displayedItems[indexPath.row]
+        let item = fetchedItemsController.object(at: indexPath)
         presentToDoItemView(with: item)
     }
 
@@ -216,7 +195,14 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     // MARK: - UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        displayedItems.count + 1
+        guard let sectionInfo = fetchedItemsController.sections?[section] else {
+            return 0
+        }
+        return sectionInfo.numberOfObjects + 1
+    }
+
+    func numberOfSections(in tableView: UITableView) -> Int {
+        fetchedItemsController.sections?.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -237,7 +223,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             return lastCell
         }
 
-        let item = displayedItems[indexPath.row]
+        let item = fetchedItemsController.object(at: indexPath)
 
         cell.setUpCell(with: item)
 
@@ -306,8 +292,15 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         guard let swipedRow = swipedRow else {
             return
         }
-        let item = displayedItems[swipedRow.row]
-        deleteItem(item)
+
+        let item = fetchedItemsController.object(at: swipedRow)
+        let itemModel = item.toImmutable
+
+        fetchedItemsController.managedObjectContext.delete(item)
+        coreDataStack.saveContext()
+
+        refreshHeaderTitle(inSection: 0)
+        deleteItem(itemModel)
     }
 
     private func infoSwiped() {
@@ -319,9 +312,15 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             return
         }
 
-        let item = displayedItems[swipedRow.row]
-        let newItem = item.toggleDone()
-        addItem(newItem)
+        let item = fetchedItemsController.object(at: swipedRow)
+        item.done.toggle()
+        item.modifiiedAt = .now
+
+        coreDataStack.saveContext()
+        let itemModel = item.toImmutable
+
+        refreshHeaderTitle(inSection: 0)
+        addItem(itemModel, isNew: false)
     }
 
     // MARK: - NetworkServiceObserverDelegate
@@ -335,11 +334,26 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     // MARK: - Private funcs
     private func updateViews() {
-        rootView.reloadData()
+        performFetch()
     }
 
     private func presentToDoItemView(with item: ToDoItem?) {
-        let toDoItem = ToDoItemViewController(module: self, item: item)
+        let childContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        childContext.parent = coreDataStack.mainContext
+
+        var childToDoItem: ToDoItem?
+        var isNewItem: Bool
+        if let item = item {
+            childToDoItem = childContext.object(with: item.objectID) as? ToDoItem
+            isNewItem = false
+        } else {
+            childToDoItem = ToDoItem(context: childContext)
+            isNewItem = true
+        }
+
+        let toDoItem = ToDoItemViewController(module: self, item: childToDoItem, context: childContext, isNewItem: isNewItem)
+        toDoItem.delegate = self
+
         let navController = UINavigationController(rootViewController: toDoItem)
 
         toDoItem.modalPresentationStyle = .automatic
@@ -356,6 +370,18 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
             addNewItemButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             addNewItemButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
+    }
+
+    private func refreshHeaderTitle(inSection section: Int) {
+        rootView.beginUpdates()
+
+        guard let headerView = rootView.headerView(forSection: section) as? Header else {
+            return
+        }
+
+        headerView.doneItemsCountLabel.text = "Выполнено – \(doneItemsCount)"
+
+        rootView.endUpdates()
     }
 
     private func setUpSpinner() {
@@ -376,14 +402,145 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         networkSpinner.hidesWhenStopped = true
     }
 
+    private lazy var baseFetchRequest: NSFetchRequest<ToDoItem> = {
+        let fetchRequest = ToDoItem.fetchRequest()
+        fetchRequest.fetchBatchSize = Constants.batchSize
+        fetchRequest.predicate = notDoneItemsPredicate
+        let sortByCreatedAt = NSSortDescriptor(key: #keyPath(ToDoItem.createdAt), ascending: false)
+
+        fetchRequest.sortDescriptors = [sortByCreatedAt]
+        return fetchRequest
+    }()
+
+    private func configure(cell: UITableViewCell, for indexPath: IndexPath) {
+        guard let cell = cell as? Cell else {
+            return
+        }
+
+        let item = fetchedItemsController.object(at: indexPath)
+        cell.setUpCell(with: item)
+    }
+
+    private func performFetch() {
+        do {
+            try fetchedItemsController.performFetch()
+            rootView.reloadData()
+        } catch let error as NSError {
+            fatalError("\(#function) failed with error: \(error.localizedDescription)")
+        }
+    }
+
+    private var doneItemsCount: Int {
+        let fetchRequest = NSFetchRequest<NSNumber>(entityName: "ToDoItem")
+
+        fetchRequest.predicate = NSPredicate(format: "%K = %@", argumentArray: [#keyPath(ToDoItem.done), true])
+
+        fetchRequest.resultType = .countResultType
+
+        do {
+            let countResult = try coreDataStack.mainContext.fetch(fetchRequest)
+            return countResult.first?.intValue ?? 0
+        } catch let error as NSError {
+            fatalError(error.description)
+        }
+    }
+
     private enum Constants {
         static let newItemButtonSize: CGFloat = 44
         static let spinnerSize: CGFloat = 100
+        static let batchSize = 20
     }
 }
 
-extension Array where Element == ToDoItem {
-    func orderedByDate() -> [ToDoItem] {
+// MARK: - NSFetchedResultsControllerDelegate
+extension ToDoListViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        rootView.beginUpdates()
+    }
+
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChange anObject: Any,
+                    at indexPath: IndexPath?,
+                    for type: NSFetchedResultsChangeType,
+                    newIndexPath: IndexPath?
+    ) {
+        switch type {
+        case .insert:
+            guard let newIndexPath = newIndexPath else { return }
+
+            rootView.insertRows(at: [newIndexPath], with: .automatic)
+        case .delete:
+            guard let indexPath = indexPath else { return }
+            rootView.deleteRows(at: [indexPath], with: .automatic)
+        case .move:
+            guard let indexPath = indexPath else { return }
+            guard let newIndexPath = newIndexPath else { return }
+
+            rootView.deleteRows(at: [indexPath], with: .automatic)
+            rootView.insertRows(at: [newIndexPath], with: .automatic)
+        case .update:
+            guard let indexPath = indexPath else { return }
+            guard let cell = rootView.dequeueReusableCell(withIdentifier: Cell.Constants.reuseId, for: indexPath) as? Cell else { return }
+
+            configure(cell: cell, for: indexPath)
+            rootView.reloadRows(at: [indexPath], with: .automatic)
+        @unknown default:
+            fatalError("unexpected error at \(#function)")
+        }
+    }
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        rootView.endUpdates()
+    }
+
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChange sectionInfo: NSFetchedResultsSectionInfo,
+                    atSectionIndex sectionIndex: Int,
+                    for type: NSFetchedResultsChangeType
+    ) {
+        let indexSet = IndexSet(integer: sectionIndex)
+
+        switch type {
+        case .insert:
+            rootView.insertSections(indexSet, with: .automatic)
+        case .delete:
+            rootView.deleteSections(indexSet, with: .automatic)
+        case .move:
+            rootView.deleteSections(indexSet, with: .automatic)
+            rootView.insertSections(indexSet, with: .automatic)
+        case .update:
+            rootView.reloadSections(indexSet, with: .automatic)
+        default:
+            break
+        }
+    }
+}
+
+// MARK: - ToDoItemViewControllerDelegate
+extension ToDoListViewController: ToDoItemViewControllerDelegate {
+    func didFinish(controller: ToDoItemViewController, didSave: Bool) {
+        defer {
+            dismiss(animated: true)
+        }
+
+        guard didSave, let context = controller.context, context.hasChanges else {
+            return
+        }
+
+        context.perform {
+            do {
+                try context.save()
+            } catch let error as NSError {
+                DDLogError(error)
+            }
+
+            self.coreDataStack.saveContext()
+        }
+    }
+}
+
+extension Array where Element == ToDoItemModel {
+    func orderedByDate() -> [ToDoItemModel] {
         self.sorted(by: {
             $0.createdAt > $1.createdAt
         })
@@ -393,19 +550,5 @@ extension Array where Element == ToDoItem {
 extension UITableView {
     func isLastRowAt(_ indexPath: IndexPath) -> Bool {
         return indexPath.row == self.numberOfRows(inSection: 0) - 1
-    }
-}
-
-extension ToDoItem {
-    func toggleDone() -> ToDoItem {
-        ToDoItem(
-            id: id,
-            text: text,
-            priority: priority,
-            createdAt: createdAt,
-            deadline: deadline,
-            done: !done,
-            modifiedAt: modifiedAt
-        )
     }
 }

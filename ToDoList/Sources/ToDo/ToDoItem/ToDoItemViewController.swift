@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol DismissableModule: UIViewController {
     func dismiss()
@@ -18,18 +19,24 @@ extension DismissableModule {
 }
 
 protocol ToDoItemModule: DismissableModule {
-    func addItem(_ item: ToDoItem?)
-    func deleteItem(_ item: ToDoItem?)
+    func addItem(_ item: ToDoItemModel?, isNew: Bool)
+    func deleteItem(_ item: ToDoItemModel?)
+}
+
+protocol ToDoItemViewControllerDelegate: AnyObject {
+    func didFinish(controller: ToDoItemViewController, didSave: Bool)
 }
 
 final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextViewDelegate {
 
     // MARK: - Views
-    private lazy var toDoItemView = ToDoItemView(module: self, item: item)
+    private lazy var toDoItemView = ToDoItemView(module: self, item: item, isNewItem: isNewItem)
 
     // MARK: - Properties
     private let module: ToDoItemModule
     private let item: ToDoItem?
+    private(set) var context: NSManagedObjectContext!
+    private let isNewItem: Bool
 
     private var rootView: ToDoItemView {
         guard let view = view as? ToDoItemView else {
@@ -38,10 +45,14 @@ final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextView
         return view
     }
 
+    var delegate: ToDoItemViewControllerDelegate?
+
     // MARK: - init
-    init(module: ToDoItemModule, item: ToDoItem?) {
+    init(module: ToDoItemModule, item: ToDoItem?, context: NSManagedObjectContext, isNewItem: Bool) {
         self.module = module
         self.item = item
+        self.context = context
+        self.isNewItem = isNewItem
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -137,11 +148,11 @@ final class ToDoItemViewController: UIViewController, ToDoItemModule, UITextView
     }
 
     // MARK: - ToDoItemModule
-    func addItem(_ item: ToDoItem?) {
-        module.addItem(item)
+    func addItem(_ item: ToDoItemModel?, isNew: Bool) {
+        module.addItem(item, isNew: isNew)
     }
 
-    func deleteItem(_ item: ToDoItem?) {
+    func deleteItem(_ item: ToDoItemModel?) {
         module.deleteItem(item)
     }
 

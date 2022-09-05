@@ -10,9 +10,9 @@ import XCTest
 
 class ToDoListTests: XCTestCase {
 
-    let firstItem = ToDoItem(text: "buy milk", priority: .low, createdAt: .now, done: false)
+    let firstItem = ToDoItemModel(text: "buy milk", priority: .low, createdAt: .now, done: false)
 
-    let secondItem = ToDoItem(
+    let secondItem = ToDoItemModel(
         id: "customId",
         text: "do homework",
         priority: .normal,
@@ -36,14 +36,14 @@ class ToDoListTests: XCTestCase {
     // MARK: - ToDoItem tests
     func testParseToJsonThenInitFromJson_ObjectsAreEqual1() {
         let jsonForItem = firstItem.json
-        let item = ToDoItem.parse(json: jsonForItem)
-        XCTAssertTrue(ToDoItem.haveSameProperties(firstItem, item))
+        let item = ToDoItemModel.parse(json: jsonForItem)
+        XCTAssertTrue(ToDoItemModel.haveSameProperties(firstItem, item))
     }
 
     func testParseToJsonThenInitFromJson_ObjectsAreEqual2() {
         let jsonForItem = secondItem.json
-        let item = ToDoItem.parse(json: jsonForItem)
-        XCTAssertTrue(ToDoItem.haveSameProperties(secondItem, item))
+        let item = ToDoItemModel.parse(json: jsonForItem)
+        XCTAssertTrue(ToDoItemModel.haveSameProperties(secondItem, item))
     }
 
     // MARK: - FileCache tests
@@ -55,7 +55,7 @@ class ToDoListTests: XCTestCase {
             XCTFail("no items in cache")
             return
         }
-        XCTAssertTrue(ToDoItem.haveSameProperties(toDoItemsFirst, firstItem))
+        XCTAssertTrue(ToDoItemModel.haveSameProperties(toDoItemsFirst, firstItem))
     }
 
     func testRemoveItem() {
@@ -63,7 +63,7 @@ class ToDoListTests: XCTestCase {
         XCTAssertNil(fileCache.remove(firstItem))
         fileCache.add(firstItem)
         XCTAssertNil(fileCache.remove(secondItem))
-        XCTAssertTrue(ToDoItem.haveSameProperties(fileCache.remove(firstItem), firstItem))
+        XCTAssertTrue(ToDoItemModel.haveSameProperties(fileCache.remove(firstItem), firstItem))
     }
 
     func testSaveToFileThenLoadFromFile_ObjectsAreEqual() throws {
@@ -97,8 +97,8 @@ extension Date {
     }
 }
 
-extension ToDoItem {
-    static func haveSameProperties(_ lhs: ToDoItem?, _ rhs: ToDoItem?) -> Bool {
+extension ToDoItemModel {
+    static func haveSameProperties(_ lhs: ToDoItemModel?, _ rhs: ToDoItemModel?) -> Bool {
         guard let lhs = lhs, let rhs = rhs else {
             if lhs == nil && rhs == nil {
                 return true

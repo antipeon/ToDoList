@@ -11,7 +11,7 @@ import CocoaLumberjack
 final class MockFileCacheService: FileCacheService {
     let fileCache = FileCache()
 
-    var toDoItems: [ToDoItem] {
+    var toDoItems: [ToDoItemModel] {
         fileCache.toDoItems
     }
 
@@ -171,15 +171,15 @@ final class MockFileCacheService: FileCacheService {
         }
     }
 
-    func add(_ newItem: ToDoItem) -> Result<Void, Error> {
+    func add(_ newItem: ToDoItemModel) -> Result<Void, Error> {
         assert(Thread.current.isMainThread)
         let didAdd = fileCache.add(newItem)
         return didAdd ? .success(()) : .failure(FileCacheServiceErrors.AddError.failAdd)
     }
 
-    func delete(id: String) -> Result<ToDoItem, Error> {
+    func delete(id: String) -> Result<ToDoItemModel, Error> {
         assert(Thread.current.isMainThread)
-        let itemWithId = ToDoItem(withId: id)
+        let itemWithId = ToDoItemModel(withId: id)
         if let item = fileCache.remove(itemWithId) {
             return .success(item)
         }
@@ -192,7 +192,7 @@ final class MockFileCacheService: FileCacheService {
     }
 }
 
-extension ToDoItem {
+extension ToDoItemModel {
     init(withId id: String) {
         self.init(id: id, text: "", priority: .normal, createdAt: .now)
     }
