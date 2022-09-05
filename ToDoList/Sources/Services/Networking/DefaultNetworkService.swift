@@ -48,7 +48,7 @@ final class DefaultNetworkService: NetworkService {
 
     // MARK: - API
     func getAllToDoItems(completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
-        syncQueue.async { [weak self] in
+        networkQueue.async { [weak self] in
             guard let self = self else {
                 return
             }
@@ -100,7 +100,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func editToDoItem(_ item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -156,7 +156,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func deleteToDoItem(at id: String, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -208,7 +208,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func updateToDoItems(withItems items: [ToDoItemModel], completion: @escaping (Result<[ToDoItemModel], Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }
@@ -264,7 +264,7 @@ final class DefaultNetworkService: NetworkService {
     }
 
     func addToDoItem(item: ToDoItemModel, completion: @escaping (Result<ToDoItemModel, Error>) -> Void) {
-        syncQueue.async(flags: .barrier) { [weak self] in
+        networkQueue.async(flags: .barrier) { [weak self] in
             guard let self = self else {
                 return
             }

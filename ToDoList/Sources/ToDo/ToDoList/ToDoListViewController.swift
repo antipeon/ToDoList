@@ -11,7 +11,7 @@ import WebKit
 import CoreData
 
 final class ToDoListViewController: UIViewController, ToDoItemModule,
-                                    ToDoListServiceDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate, TokenChangerDelegate {
+                                    ToDoListServiceDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
 
     // MARK: - init
     init(model: ToDoListService, observer: NetworkServiceObserver) {
@@ -92,8 +92,6 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
 
         fetchedItemsController.delegate = self
         performFetch()
-
-        model.load()
 
         setUpAddNewItemButton()
         setUpSpinner()
@@ -301,6 +299,7 @@ final class ToDoListViewController: UIViewController, ToDoItemModule,
         fetchedItemsController.managedObjectContext.delete(item)
         coreDataStack.saveContext()
 
+        refreshHeaderTitle(inSection: 0)
         deleteItem(itemModel)
     }
 
