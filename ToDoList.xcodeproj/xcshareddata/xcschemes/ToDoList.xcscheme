@@ -50,6 +50,13 @@
             ReferencedContainer = "container:ToDoList.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "yandex-api-token"
+            value = "EffectiveDetailsOfEnchantingSpectacles"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

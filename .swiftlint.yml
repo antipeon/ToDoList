@@ -6,7 +6,7 @@ type_body_length:
   - 300 # warning
   - 400 # error
 file_length:
-  - 420
+  - 450
   - 500
 nesting:
   type_level:

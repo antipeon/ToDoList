@@ -7,6 +7,7 @@
 
 import UIKit
 import CocoaLumberjack
+import WebKit
 
 protocol ToDoListModule: ToDoItemModule {
     var doneItemsCount: Int { get }
@@ -14,15 +15,16 @@ protocol ToDoListModule: ToDoItemModule {
 }
 
 final class ToDoListViewController: UIViewController, ToDoListModule,
-                                    ToDoListModelDelegate, UITableViewDelegate, UITableViewDataSource {
+                                    ToDoListServiceDelegate, UITableViewDelegate, UITableViewDataSource, NetworkServiceObserverDelegate {
 
     // MARK: - init
-    init(model: ToDoListModel) {
+    init(model: ToDoListService, observer: NetworkServiceObserver) {
         self.model = model
-        self.network = MockNetworkService()
+        self.networkServiceObserver = observer
         super.init(nibName: nil, bundle: nil)
 
         model.delegate = self
+        networkServiceObserver.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -39,9 +41,9 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     private lazy var toDoListView = ToDoListView(module: self)
 
-    private let model: ToDoListModel
+    private let model: ToDoListService
 
-    private let network: NetworkService
+    private let networkServiceObserver: NetworkServiceObserver
 
     private var showOnlyNotDone = true {
         didSet {
@@ -79,35 +81,37 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         return button
     }()
 
-    lazy var spinner: SpinnerView = {
+    private lazy var spinner: SpinnerView = {
         SpinnerView(frame: .zero)
+    }()
+
+    private lazy var networkSpinner: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        return view
     }()
 
     // MARK: - UIViewController
     override func loadView() {
         super.loadView()
         view = toDoListView
-        model.load()
-
-        let fetchFromNetworkErrorMessage = "failed to fetch items from network"
-        let fetchFromNetworkSuccessfulMessage = "fetched from network successful"
-        network.getAllToDoItems { result in
-            switch result {
-            case .success(let items):
-                DDLogVerbose("\(fetchFromNetworkSuccessfulMessage) with items: \(items)")
-            case .failure(let error):
-                DDLogError("\(fetchFromNetworkErrorMessage) with error: \(error.localizedDescription)")
-            }
-        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpAddNewItemButton()
         setUpSpinner()
+        setUpNetworkSpinner()
 
         rootView.register(Header.self, forHeaderFooterViewReuseIdentifier: Header.Constants.reuseIdentifier)
         rootView.register(LastCell.self, forCellReuseIdentifier: LastCell.Constants.reuseIdentifier)
+
+        model.load()
+    }
+
+    override var navigationItem: UINavigationItem {
+        let item = UINavigationItem(title: "Мои дела")
+        item.rightBarButtonItem = UIBarButtonItem(customView: networkSpinner)
+        return item
     }
 
     // MARK: - ToDoListModule
@@ -146,6 +150,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
 
     func didLoad() {
         spinner.removeFromSuperview()
+        updateViews()
+    }
+
+    func didSynchronize() {
         updateViews()
     }
 
@@ -257,10 +265,7 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         if tableView.isLastRowAt(indexPath) {
             return nil
         }
-        let item = displayedItems[indexPath.row]
-        if item.done {
-            return nil
-        }
+
         let config = UISwipeActionsConfiguration(actions: [doneAction])
         config.performsFirstActionWithFullSwipe = false
         return config
@@ -315,8 +320,17 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         }
 
         let item = displayedItems[swipedRow.row]
-        let newItem = item.toDone()
+        let newItem = item.toggleDone()
         addItem(newItem)
+    }
+
+    // MARK: - NetworkServiceObserverDelegate
+    func didNetworkWorkStart() {
+        networkSpinner.startAnimating()
+    }
+
+    func didNetworkWorkFinish() {
+        networkSpinner.stopAnimating()
     }
 
     // MARK: - Private funcs
@@ -358,6 +372,10 @@ final class ToDoListViewController: UIViewController, ToDoListModule,
         )
     }
 
+    private func setUpNetworkSpinner() {
+        networkSpinner.hidesWhenStopped = true
+    }
+
     private enum Constants {
         static let newItemButtonSize: CGFloat = 44
         static let spinnerSize: CGFloat = 100
@@ -379,14 +397,14 @@ extension UITableView {
 }
 
 extension ToDoItem {
-    func toDone() -> ToDoItem {
+    func toggleDone() -> ToDoItem {
         ToDoItem(
             id: id,
             text: text,
             priority: priority,
             createdAt: createdAt,
             deadline: deadline,
-            done: true,
+            done: !done,
             modifiedAt: modifiedAt
         )
     }

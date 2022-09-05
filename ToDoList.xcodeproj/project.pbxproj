@@ -20,17 +20,28 @@
 		FA25172A28905C930036D100 /* FileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA25172928905C930036D100 /* FileCache.swift */; };
 		FA25172D2891D8CA0036D100 /* ToDoItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA25172C2891D8CA0036D100 /* ToDoItemView.swift */; };
 		FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */; };
+		FA2ECA8928B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8828B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift */; };
+		FA2ECA8B28B27F01005A85B6 /* NetworkServiceObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8A28B27F01005A85B6 /* NetworkServiceObserver.swift */; };
+		FA2ECA8D28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8C28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift */; };
+		FA2ECA9028B2C559005A85B6 /* YandexOauthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */; };
 		FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */; };
 		FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3792F928959FC10099B1A8 /* SceneDelegate.swift */; };
+		FA53B65328AD06E10083B0E8 /* DefaultNetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65228AD06E10083B0E8 /* DefaultNetworkService.swift */; };
+		FA53B65628AD09080083B0E8 /* ToDoItemNetworkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65528AD09080083B0E8 /* ToDoItemNetworkModel.swift */; };
+		FA53B65828AD14370083B0E8 /* GetListResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65728AD14370083B0E8 /* GetListResponseModel.swift */; };
+		FA53B65B28AE817B0083B0E8 /* PostItemRequestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65A28AE817B0083B0E8 /* PostItemRequestModel.swift */; };
+		FA53B65F28AE85600083B0E8 /* PostItemResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B65E28AE85600083B0E8 /* PostItemResponseModel.swift */; };
+		FA53B66328AEF5850083B0E8 /* PatchItemsRequestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA53B66228AEF5850083B0E8 /* PatchItemsRequestModel.swift */; };
 		FA755F332895A29D00327D32 /* ToDoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F322895A29D00327D32 /* ToDoListView.swift */; };
 		FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F352895A70D00327D32 /* UIView+Extensions.swift */; };
 		FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */; };
+		FA7B95F428B118990002B678 /* ExponentialRetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA7B95F328B118990002B678 /* ExponentialRetry.swift */; };
 		FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */; };
 		FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */; };
 		FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */; };
 		FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */; };
 		FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED3289DD449008A6690 /* LastCell.swift */; };
-		FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED5289E987A008A6690 /* ToDoListModel.swift */; };
+		FAB72ED6289E987A008A6690 /* ToDoListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED5289E987A008A6690 /* ToDoListService.swift */; };
 		FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72ED8289ECA77008A6690 /* PriorityView.swift */; };
 		FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDA289ED726008A6690 /* DeadlineView.swift */; };
 		FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */; };
@@ -84,17 +95,28 @@
 		FA25172928905C930036D100 /* FileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCache.swift; sourceTree = "<group>"; };
 		FA25172C2891D8CA0036D100 /* ToDoItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemView.swift; sourceTree = "<group>"; };
 		FA2D4F52289F146000D1C102 /* NSLayoutConstraint+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+Extensions.swift"; sourceTree = "<group>"; };
+		FA2ECA8828B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableDefaultNetworkingService.swift; sourceTree = "<group>"; };
+		FA2ECA8A28B27F01005A85B6 /* NetworkServiceObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceObserver.swift; sourceTree = "<group>"; };
+		FA2ECA8C28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceObserverImpl.swift; sourceTree = "<group>"; };
+		FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YandexOauthController.swift; sourceTree = "<group>"; };
 		FA3792F728958FBE0099B1A8 /* ToDoItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemViewController.swift; sourceTree = "<group>"; };
 		FA3792F928959FC10099B1A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		FA53B65228AD06E10083B0E8 /* DefaultNetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultNetworkService.swift; sourceTree = "<group>"; };
+		FA53B65528AD09080083B0E8 /* ToDoItemNetworkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoItemNetworkModel.swift; sourceTree = "<group>"; };
+		FA53B65728AD14370083B0E8 /* GetListResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetListResponseModel.swift; sourceTree = "<group>"; };
+		FA53B65A28AE817B0083B0E8 /* PostItemRequestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostItemRequestModel.swift; sourceTree = "<group>"; };
+		FA53B65E28AE85600083B0E8 /* PostItemResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostItemResponseModel.swift; sourceTree = "<group>"; };
+		FA53B66228AEF5850083B0E8 /* PatchItemsRequestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchItemsRequestModel.swift; sourceTree = "<group>"; };
 		FA755F322895A29D00327D32 /* ToDoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListView.swift; sourceTree = "<group>"; };
 		FA755F352895A70D00327D32 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		FA755F382895ADC700327D32 /* UIStackView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIStackView+Extensions.swift"; sourceTree = "<group>"; };
+		FA7B95F328B118990002B678 /* ExponentialRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialRetry.swift; sourceTree = "<group>"; };
 		FAB72EAB289610FF008A6690 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
 		FAB72EAD2899D031008A6690 /* FontsColorsConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontsColorsConstants.swift; sourceTree = "<group>"; };
 		FAB72ECF289DD395008A6690 /* ToDoListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListHeaderView.swift; sourceTree = "<group>"; };
 		FAB72ED1289DD427008A6690 /* ToDoListCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListCellView.swift; sourceTree = "<group>"; };
 		FAB72ED3289DD449008A6690 /* LastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LastCell.swift; sourceTree = "<group>"; };
-		FAB72ED5289E987A008A6690 /* ToDoListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListModel.swift; sourceTree = "<group>"; };
+		FAB72ED5289E987A008A6690 /* ToDoListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListService.swift; sourceTree = "<group>"; };
 		FAB72ED8289ECA77008A6690 /* PriorityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriorityView.swift; sourceTree = "<group>"; };
 		FAB72EDA289ED726008A6690 /* DeadlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeadlineView.swift; sourceTree = "<group>"; };
 		FAB72EDC289EE034008A6690 /* SwitchSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchSectionView.swift; sourceTree = "<group>"; };
@@ -210,7 +232,7 @@
 			children = (
 				FA251727288F59480036D100 /* ToDoItem.swift */,
 				FA25172928905C930036D100 /* FileCache.swift */,
-				FAB72ED5289E987A008A6690 /* ToDoListModel.swift */,
+				FAB72ED5289E987A008A6690 /* ToDoListService.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -218,6 +240,7 @@
 		FA25172B2891D8710036D100 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				FA2ECA8E28B2C540005A85B6 /* Authorization */,
 				FAD6FD6328A52E350038DC02 /* Services */,
 				FA755F342895A6E700327D32 /* Extensions */,
 				FA251726288F592E0036D100 /* Model */,
@@ -225,6 +248,14 @@
 				FA3792F428958EB50099B1A8 /* ToDo */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		FA2ECA8E28B2C540005A85B6 /* Authorization */ = {
+			isa = PBXGroup;
+			children = (
+				FA2ECA8F28B2C559005A85B6 /* YandexOauthController.swift */,
+			);
+			path = Authorization;
 			sourceTree = "<group>";
 		};
 		FA3792F028958E390099B1A8 /* ToDoItem */ = {
@@ -263,6 +294,47 @@
 				FA3792F028958E390099B1A8 /* ToDoItem */,
 			);
 			path = ToDo;
+			sourceTree = "<group>";
+		};
+		FA53B65428AD08E30083B0E8 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65928AD68720083B0E8 /* Models */,
+				FA53B65228AD06E10083B0E8 /* DefaultNetworkService.swift */,
+				FA2ECA8A28B27F01005A85B6 /* NetworkServiceObserver.swift */,
+				FA2ECA8C28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift */,
+				FA7B95F328B118990002B678 /* ExponentialRetry.swift */,
+				FA2ECA8828B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		FA53B65928AD68720083B0E8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65D28AE81900083B0E8 /* Request */,
+				FA53B65C28AE81880083B0E8 /* Response */,
+				FA53B65528AD09080083B0E8 /* ToDoItemNetworkModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FA53B65C28AE81880083B0E8 /* Response */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65728AD14370083B0E8 /* GetListResponseModel.swift */,
+				FA53B65E28AE85600083B0E8 /* PostItemResponseModel.swift */,
+			);
+			path = Response;
+			sourceTree = "<group>";
+		};
+		FA53B65D28AE81900083B0E8 /* Request */ = {
+			isa = PBXGroup;
+			children = (
+				FA53B65A28AE817B0083B0E8 /* PostItemRequestModel.swift */,
+				FA53B66228AEF5850083B0E8 /* PatchItemsRequestModel.swift */,
+			);
+			path = Request;
 			sourceTree = "<group>";
 		};
 		FA755F342895A6E700327D32 /* Extensions */ = {
@@ -310,6 +382,7 @@
 		FAD6FD6328A52E350038DC02 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				FA53B65428AD08E30083B0E8 /* Networking */,
 				FAD6FD6928A5301D0038DC02 /* Mocks */,
 				FAD6FD6828A530060038DC02 /* Protocols */,
 			);
@@ -594,15 +667,23 @@
 				FAD6FD6728A52F040038DC02 /* FileCacheServiceProtocol.swift in Sources */,
 				FAB72EDB289ED726008A6690 /* DeadlineView.swift in Sources */,
 				FA2D4F53289F146000D1C102 /* NSLayoutConstraint+Extensions.swift in Sources */,
+				FA2ECA8B28B27F01005A85B6 /* NetworkServiceObserver.swift in Sources */,
 				FAB72ED0289DD395008A6690 /* ToDoListHeaderView.swift in Sources */,
 				FAD6FD6B28A530350038DC02 /* MockFileCacheService.swift in Sources */,
+				FA53B65B28AE817B0083B0E8 /* PostItemRequestModel.swift in Sources */,
+				FA2ECA9028B2C559005A85B6 /* YandexOauthController.swift in Sources */,
 				FA2516FB288F56420036D100 /* ToDoListViewController.swift in Sources */,
 				FAB72ED4289DD449008A6690 /* LastCell.swift in Sources */,
 				FA755F392895ADC700327D32 /* UIStackView+Extensions.swift in Sources */,
 				FAB72ED9289ECA77008A6690 /* PriorityView.swift in Sources */,
-				FAB72ED6289E987A008A6690 /* ToDoListModel.swift in Sources */,
+				FAB72ED6289E987A008A6690 /* ToDoListService.swift in Sources */,
+				FA2ECA8928B27ECB005A85B6 /* ObservableDefaultNetworkingService.swift in Sources */,
+				FA53B65828AD14370083B0E8 /* GetListResponseModel.swift in Sources */,
 				FA3792FA28959FC10099B1A8 /* SceneDelegate.swift in Sources */,
+				FA7B95F428B118990002B678 /* ExponentialRetry.swift in Sources */,
 				FAB72ED2289DD427008A6690 /* ToDoListCellView.swift in Sources */,
+				FA53B65F28AE85600083B0E8 /* PostItemResponseModel.swift in Sources */,
+				FA53B65328AD06E10083B0E8 /* DefaultNetworkService.swift in Sources */,
 				FAB72EAC289610FF008A6690 /* Collection+Extensions.swift in Sources */,
 				FA755F362895A70D00327D32 /* UIView+Extensions.swift in Sources */,
 				FA3792F828958FBE0099B1A8 /* ToDoItemViewController.swift in Sources */,
@@ -613,8 +694,11 @@
 				FA251728288F59480036D100 /* ToDoItem.swift in Sources */,
 				FAD6FD6528A52E560038DC02 /* NetworkServiceProtocol.swift in Sources */,
 				FAB72EDD289EE034008A6690 /* SwitchSectionView.swift in Sources */,
+				FA53B65628AD09080083B0E8 /* ToDoItemNetworkModel.swift in Sources */,
 				FAB72EAE2899D031008A6690 /* FontsColorsConstants.swift in Sources */,
 				FA25172A28905C930036D100 /* FileCache.swift in Sources */,
+				FA2ECA8D28B27F4A005A85B6 /* NetworkServiceObserverImpl.swift in Sources */,
+				FA53B66328AEF5850083B0E8 /* PatchItemsRequestModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
