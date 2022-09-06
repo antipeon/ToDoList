@@ -43,7 +43,12 @@ final class DefaultNetworkService: NetworkService {
 
     // MARK: - init
     init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(setYandexOauthToken(_:)), name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName), object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(setYandexOauthToken(_:)),
+            name: NSNotification.Name(YandexOauthController.Constants.useOauthNotificationName),
+            object: nil
+        )
     }
 
     // MARK: - API

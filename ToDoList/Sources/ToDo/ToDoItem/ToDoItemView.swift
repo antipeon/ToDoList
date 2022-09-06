@@ -105,14 +105,12 @@ final class ToDoItemView: UIView {
 
     // MARK: - Public Methods
     func cancel() {
-//        module.dismiss()
         module.delegate?.didFinish(controller: module, didSave: false)
     }
 
     func save() throws {
         updateModel()
         module.addItem(item?.toImmutable, isNew: isNewItem)
-//        module.dismiss()
 
         module.delegate?.didFinish(controller: module, didSave: true)
     }
@@ -206,24 +204,27 @@ final class ToDoItemView: UIView {
     }
 
     private func setUpToDoText() {
-        if let item = item {
-            toDoText.text = item.text
-            toDoText.textColor = AppConstants.Colors.labelPrimary
+        if isNewItem {
+            setUpTextViewPlaceholder(toDoText)
             return
         }
-        setUpTextViewPlaceholder(toDoText)
+
+        toDoText.text = item?.text
+        toDoText.textColor = AppConstants.Colors.labelPrimary
     }
 
     private func setUpPriority() {
-        if let item = item {
-            switch item.priority {
-            case .high:
-                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 2
-            case .normal:
-                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 1
-            case .low:
-                switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 0
-            }
+        guard !isNewItem, let item = item else {
+            return
+        }
+
+        switch item.priority {
+        case .high:
+            switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 2
+        case .normal:
+            switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 1
+        case .low:
+            switchSection.prioritySwitchAndLabel.prioritySwitch.selectedSegmentIndex = 0
         }
     }
 
@@ -275,7 +276,7 @@ final class ToDoItemView: UIView {
     }
 
     private lazy var initialDeadline: Date = {
-        if let deadline = item?.deadline {
+        if !isNewItem, let deadline = item?.deadline {
             return deadline
         }
 
@@ -305,7 +306,6 @@ final class ToDoItemView: UIView {
 
         updateModel()
         module.deleteItem(item.toImmutable)
-//        module.dismiss()
 
         item.managedObjectContext?.delete(item)
 
@@ -358,27 +358,6 @@ final class ToDoItemView: UIView {
             item.done = false
             item.id = UUID().uuidString
         }
-
-//        if let item = item {
-//            self.item = ToDoItemModel(
-//                id: item.id,
-//                text: toDoText.text,
-//                priority: priority,
-//                createdAt: item.createdAt,
-//                deadline: deadline,
-//                done: item.done,
-//                modifiedAt: now
-//            )
-//            return
-//        }
-//
-//        item = ToDoItemModel(
-//            text: toDoText.text,
-//            priority: priority,
-//            createdAt: now,
-//            deadline: deadline,
-//            modifiedAt: now
-//        )
     }
 
     // MARK: - Constants
